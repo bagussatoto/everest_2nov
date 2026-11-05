@@ -1,0 +1,19 @@
+# Logs and cache
+logs/
+*.log
+profile.txt
+
+# Temporary/Cache files
+application/cache/*
+!application/cache/index.html
+!application/cache/.gitkeep
+application/logs/*
+!application/logs/index.html
+!application/logs/.gitkeep
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store

@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Operator: Fitur Cek Saldo Supplier (Toggle Mode & 1-Klik Proses)</title>
+    <style>
+        :root {
+            --primary: #0073b7;
+            --primary-dark: #005689;
+            --sidebar-bg: #222d32;
+            --sidebar-hover: #1e282c;
+            --sidebar-active: #1a2226;
+            --content-bg: #ecf0f5;
+            --border-color: #d2d6de;
+            --success: #00a65a;
+            --warning: #f39c12;
+            --danger: #dd4b39;
+            --info: #00c0ef;
+            --table-header: #f4f4f4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #333;
+            color: #333;
+            font-size: 12px;
+            line-height: 1.42857143;
+        }
+
+        /* BANNER SIMULASI DAN PANDUAN OPERATOR */
+        .operator-guide-bar {
+            background: linear-gradient(135deg, #1e3a8a, #0f172a);
+            color: #fff;
+            padding: 12px 20px;
+            border-bottom: 3px solid #f59e0b;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 9999;
+        }
+
+        .guide-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .guide-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .guide-title h1 {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #fcd34d;
+        }
+
+        .guide-steps {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .step-pill {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .step-pill.active {
+            background: #f59e0b;
+            color: #000;
+            font-weight: 700;
+            border-color: #f59e0b;
+        }
+
+        .step-num {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 50%;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .step-pill.active .step-num {
+            background: #000;
+            color: #fff;
+        }
+
+        /* ERP SHELL LAYOUT */
+        .erp-wrapper {
+            max-width: 1650px;
+            margin: 15px auto;
+            background: #fff;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 900px;
+        }
+
+        /* Top Navbar */
+        .erp-header {
+            background-color: var(--primary);
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            color: #fff;
+        }
+
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .btn-toggle-menu {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 12px;
+        }
+
+        .badge-notif {
+            background: #dd4b39;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* Main Workspace Container (Sidebar + Content) */
+        .erp-main-body {
+            display: flex;
+            flex: 1;
+            background: var(--content-bg);
+        }
+
+        /* Left Sidebar */
+        .erp-sidebar {
+            width: 220px;
+            background: var(--sidebar-bg);
+            color: #b8c7ce;
+            flex-shrink: 0;
+            font-size: 11px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding-top: 5px;
+        }
+
+        .sidebar-menu li {
+            position: relative;
+        }
+
+        .sidebar-menu li a {
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #b8c7ce;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu li.active a, .sidebar-menu li a:hover {
+            color: #fff;
+            background: var(--sidebar-hover);
+        }
+
+        .sidebar-menu li.active a {
+            border-left-color: var(--primary);
+            background: var(--sidebar-active);
+        }
+
+        /* Content Area */
+        .erp-content {
+            flex: 1;
+            padding: 12px 18px;
+            background: var(--content-bg);
+            overflow-x: auto;
+        }
+
+        /* Tab Bar Modul */
+        .module-tabs {
+            display: flex;
+            gap: 2px;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 12px;
+            background: #fff;
+            padding: 4px 6px 0;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-btn {
+            background: #e4e7ea;
+            border: 1px solid #d2d6de;
+            border-bottom: none;
+            padding: 7px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #555;
+            cursor: pointer;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        .right-sub-tabs {
+            margin-left: auto;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .sub-tab-link {
+            font-size: 11px;
+            color: #666;
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+        }
+
+        .sub-tab-link.active-action {
+            background: #00a65a;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        /* Process Step Bar */
+        .process-flow-card {
+            background: #fff;
+            border: 1px solid #d2d6de;
+            border-radius: 3px;
+            padding: 10px 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-process-flow {
+            background: #d9534f;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 3px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .step-circle {
+            width: 26px;
+            height: 26px;
+            background: #f39c12;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 12px;
+        }
+
+        /* SECTION BOX: DAFTAR KLAIM KE SUPPLIER */
+        .erp-box {
+            background: #fff;
+            border-top: 3px solid #d2d6de;
+            border-radius: 3px;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            margin-bottom: 18px;
+            border: 1px solid #d2d6de;
+        }
+
+        .erp-box.box-primary {
+            border-top: 3px solid var(--primary);
+        }
+
+        .erp-box.box-success {
+            border-top: 3px solid var(--success);
+        }
+
+        .box-header {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f4f4f4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+        }
+
+        .box-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Live Selection Green Banner */
+        .selection-banner {
+            background: #dff0d8;
+            border: 1px solid #d6e9c6;
+            color: #3c763d;
+            padding: 8px 15px;
+            border-radius: 3px;
+            margin: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .btn-create-tx {
+            background: #28a745;
+            color: #fff;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 3px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-create-tx:hover {
+            background: #218838;
+        }
+
+        .btn-create-tx:disabled {
+            background: #b8c7ce;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Filter Controls */
+        .filter-toolbar {
+            padding: 0 15px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-weight: 700;
+            color: #555;
+            font-size: 11px;
+            margin-right: 4px;
+        }
+
+        .btn-filter-pill {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            cursor: pointer;
+            color: #444;
+        }
+
+        .btn-filter-pill.active {
+            background: #0073b7;
+            color: #fff;
+            border-color: #0073b7;
+            font-weight: 700;
+        }
+
+        /* DATA TABLE TOOLBAR (WHERE THE OPERATOR TOGGLE RESIDES) */
+        .table-action-bar {
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-left-tools {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .table-right-tools {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Tombol Pilihan Mode Tampilan (Toggle Operator) */
+        .view-mode-toggle-group {
+            display: flex;
+            background: #e2e8f0;
+            padding: 3px;
+            border-radius: 5px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-view-mode {
+            border: none;
+            background: transparent;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-view-mode.active {
+            background: #0073b7;
+            color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .btn-view-mode.highlight-mode {
+            background: #f59e0b;
+            color: #000;
+        }
+
+        .btn-view-mode.highlight-mode.active {
+            background: #d97706;
+            color: #fff;
+        }
+
+        .badge-count {
+            background: rgba(0,0,0,0.15);
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+        }
+
+        .btn-view-mode.active .badge-count {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Active Filter Indicator Badge */
+        .active-filter-badge {
+            background: #e0f2fe;
+            border: 1px solid #7dd3fc;
+            color: #0369a1;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .btn-clear-filter {
+            background: #0284c7;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            line-height: 16px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        /* TABLES STYLING */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .erp-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .erp-data-table th, .erp-data-table td {
+            border: 1px solid #e5e7eb;
+            padding: 7px 9px;
+            vertical-align: middle;
+        }
+
+        .erp-data-table th {
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .erp-data-table tbody tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .erp-data-table tr.row-selected {
+            background-color: #fef3c7 !important;
+        }
+
+        .text-right { text-align: right !important; }
+        .text-center { text-align: center !important; }
+        .font-mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; }
+        .font-bold { font-weight: 700; }
+        .text-blue { color: #0073b7; font-weight: 700; }
+        .text-green { color: #166534; font-weight: 700; }
+        .text-red { color: #b91c1c; font-weight: 700; }
+
+        .tag-pill {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .tag-pill.tag-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .tag-pill.tag-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .tag-pill.tag-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        /* ACTION BUTTONS DALAM TABEL OPERATOR */
+        .btn-select-vendor {
+            background: linear-gradient(180deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .btn-select-vendor:hover {
+            background: linear-gradient(180deg, #059669, #047857);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .btn-action-view {
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Collapsible Saldo Nihil (Zero Balance) */
+        .zero-balance-trigger {
+            background-color: #f8fafc;
+            cursor: pointer;
+            font-weight: 700;
+            color: #475569;
+        }
+
+        .zero-balance-trigger:hover {
+            background-color: #e2e8f0;
+        }
+
+        .row-zero-hidden {
+            display: none;
+            background-color: #fafafa;
+        }
+
+        /* Modal Drawer Detail Supplier */
+        .drawer-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            display: none;
+            justify-content: flex-end;
+        }
+
+        .drawer-content {
+            width: 750px;
+            max-width: 90vw;
+            height: 100%;
+            background: #fff;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .drawer-header {
+            padding: 15px 20px;
+            background: #0073b7;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .drawer-body {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-3px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================================================= -->
+    <!-- 1. SIMULASI PANDUAN KERJA OPERATOR (INTERACTIVE REVIEW BAR) -->
+    <!-- ========================================================================= -->
+    <div class="operator-guide-bar">
+        <div class="guide-container">
+            <div class="guide-title">
+                <span style="font-size: 20px;">⚡</span>
+                <div>
+                    <h1>SIMULASI ALUR OPERATOR: REKAP SALDO KLAIM SUPPLIER (COA 1010020030)</h1>
+                    <span style="font-size: 11px; color: #cbd5e1;">Uji coba langsung bagaimana tombol toggle mempermudah operator mengetahui saldo aktif dan langsung memproses transaksi.</span>
+                </div>
+            </div>
+
+            <!-- Interaktif Workflow Steps -->
+            <div class="guide-steps">
+                <div class="step-pill active" id="pillStep1">
+                    <span class="step-num">1</span>
+                    <span>Klik [🏢 Cek Saldo Supplier]</span>
+                </div>
+                <span style="color: #64748b;">➔</span>
+                <div class="step-pill" id="pillStep2">
+                    <span class="step-num">2</span>
+                    <span>Pilih PT. PANASONIC</span>
+                </div>
+                <span style="color: #64748b;">➔</span>
+                <div class="step-pill" id="pillStep3">
+                    <span class="step-num">3</span>
+                    <span>Tabel Otomatis Filter 4 Nota</span>
+                </div>
+                <span style="color: #64748b;">➔</span>
+                <div class="step-pill" id="pillStep4">
+                    <span class="step-num">4</span>
+                    <span>Centang &amp; Buat Transaksi</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 2. ERP WORKSPACE UTAMA (LAYOUT PERSIS TRANSAKSI 3333 EVEREST) -->
+    <!-- ========================================================================= -->
+    <div class="erp-wrapper">
+
+        <!-- Top Header Navigation -->
+        <header class="erp-header">
+            <div class="brand-area">
+                <button class="btn-toggle-menu">☰</button>
+                <span>PT. EVEREST ELECTRONIC</span>
+                <span style="margin-left: 10px; font-weight: normal; opacity: 0.9;">| REALISASI KLAIM DISKON KE SUPPLIER 📄</span>
+            </div>
+            <div class="user-area">
+                <span class="badge-notif">0</span>
+                <span>👤 Shadow, Login Di PUSAT (DC)</span>
+            </div>
+        </header>
+
+        <!-- Main Body Wrapper -->
+        <div class="erp-main-body">
+
+            <!-- Sidebar Kiri -->
+            <aside class="erp-sidebar">
+                <ul class="sidebar-menu">
+                    <li><a href="javascript:void(0)">📁 DATA</a></li>
+                    <li><a href="javascript:void(0)">⇄ TRANSAKSI</a></li>
+                    <li><a href="javascript:void(0)">📋 JURNAL PUSAT (DC)</a></li>
+                    <li><a href="javascript:void(0)">🏦 REKENING PUSAT (DC)</a></li>
+                    <li><a href="javascript:void(0)">📊 NERACA LAJUR PUSAT (DC)</a></li>
+                    <li class="active"><a href="javascript:void(0)">⚖ Trial Balance</a></li>
+                    <li><a href="javascript:void(0)">📦 PERSEDIAAN PUSAT (DC)</a></li>
+                    <li><a href="javascript:void(0)">📈 LAPORAN KEUANGAN PUSAT</a></li>
+                    <li><a href="javascript:void(0)">⚙ UTILITY PUSAT (DC)</a></li>
+                    <li><a href="javascript:void(0)">🚪 LOGOUT</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content Operasional -->
+            <main class="erp-content">
+
+                <!-- Module Breadcrumb Tabs -->
+                <div class="module-tabs">
+                    <button class="tab-btn">(1) TAMBAHAN DISKON</button>
+                    <button class="tab-btn">(2) REALISASI KLAIM KE SUPPLIER</button>
+                    <button class="tab-btn active">(3) REALISASI KLAIM DISKON KE SUPPLIER Index</button>
+                    <div class="right-sub-tabs">
+                        <a href="javascript:void(0)" class="sub-tab-link">on going</a>
+                        <a href="javascript:void(0)" class="sub-tab-link">out standing</a>
+                        <a href="javascript:void(0)" class="sub-tab-link">histories</a>
+                        <a href="javascript:void(0)" class="sub-tab-link">status</a>
+                        <a href="javascript:void(0)" class="sub-tab-link">reports</a>
+                        <a href="javascript:void(0)" class="sub-tab-link active-action">+new REALISASI KLAIM DISKON</a>
+                    </div>
+                </div>
+
+                <!-- Process Flow Card -->
+                <div class="process-flow-card">
+                    <button class="btn-process-flow">PROSES YANG HARUS DILALUI ➔</button>
+                    <div class="step-circle">1</div>
+                    <div>
+                        <strong style="color: #0073b7; font-size: 12px;">REALISASI KLAIM DISKON KE SUPPLIER</strong>
+                        <div style="font-size: 11px; color: #777;">KANTOR PUSAT &bull; Menunggu seleksi nota GRN yang akan diklaimkan</div>
+                    </div>
+                    <div style="margin-left: auto; font-size: 11px; display: flex; gap: 15px;">
+                        <span><span style="color: #dd4b39;">●</span> Motif Merah: Butuh tindak lanjut Anda</span>
+                        <span><span style="color: #f39c12;">●</span> Motif Kuning: Butuh pihak lain</span>
+                    </div>
+                </div>
+
+                <!-- ========================================================================= -->
+                <!-- BLOK 1: DAFTAR KLAIM KE SUPPLIER (TABEL ATAS) -->
+                <!-- ========================================================================= -->
+                <div class="erp-box box-primary">
+                    <div class="box-header">
+                        <div class="box-title">
+                            <span style="color: #dd4b39;">⚠</span>
+                            <span>DAFTAR KLAIM KE SUPPLIER</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label style="font-weight: 700; color: #555;">Pilih Supplier:</label>
+                            <select id="selectSupplierBox" style="background:#f39c12; color:#fff; border:1px solid #e08e0b; padding:5px 12px; border-radius:3px; font-weight:700; font-size:11px;" onchange="onDropdownSupplierChange(this.value)">
+                                <option value="ALL">---pilih supplier (Semua Supplier)---</option>
+                                <option value="PANASONIC">PT. PANASONIC GOBEL INDONESIA (Saldo: Rp 5.654.426)</option>
+                                <option value="SAFKINDO">PT SAFKINDO SAKTI (Saldo: Rp 2.846.880)</option>
+                                <option value="DAIKIN">PT DAIKIN AIRCONDITIONING INDONESIA (Saldo: Rp 1.332.587)</option>
+                                <option value="FACTORY">PT. FACTORY OUTLET ELEKTRONIKA (Saldo: Rp 409.411)</option>
+                                <option value="SHARP">PT. SHARP ELECTRONICS INDONESIA (Saldo: Rp 242.000)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Live Selection Green Banner -->
+                    <div class="selection-banner">
+                        <div id="selectionStatusText">
+                            ✔ <strong>Terpilih:</strong> <span id="lblSelectedCount">0</span> Nota &nbsp;|&nbsp; 
+                            <strong>Total Nilai Klaim:</strong> <span id="lblSelectedTotal" class="font-mono">Rp 0</span>
+                        </div>
+                        <button class="btn-create-tx" id="btnProsesTransaksi" disabled onclick="alertProsesSukses()">
+                            <span>🚀</span> PROSES KLAIM SEKARANG (#3333)
+                        </button>
+                    </div>
+
+                    <!-- Filter Kategori & Kolom Diskon -->
+                    <div class="filter-toolbar">
+                        <div class="filter-row">
+                            <span class="filter-label">KATEGORI:</span>
+                            <button class="btn-filter-pill active">Semua (174)</button>
+                            <button class="btn-filter-pill">Hanya Diskon Reguler (165)</button>
+                            <button class="btn-filter-pill">Hanya Free Produk (9)</button>
+                            <button class="btn-filter-pill">Kombinasi (0)</button>
+                        </div>
+                        <div class="filter-row">
+                            <span class="filter-label">KOLOM DISKON:</span>
+                            <button class="btn-filter-pill">Diskon 1 (130)</button>
+                            <button class="btn-filter-pill">Diskon 2 (82)</button>
+                            <button class="btn-filter-pill">Diskon 3 (44)</button>
+                            <button class="btn-filter-pill">Diskon 4 (22)</button>
+                            <button class="btn-filter-pill">Diskon 5 (4)</button>
+                            <button class="btn-filter-pill">Diskon 6 (0)</button>
+                            <button class="btn-filter-pill">Free Produk (07)</button>
+                        </div>
+                    </div>
+
+                    <!-- ===================================================================== -->
+                    <!-- TOOLBAR TABEL: LOKASI TOMBOL TOGGLE VIEW UNTUK OPERATOR -->
+                    <!-- ===================================================================== -->
+                    <div class="table-action-bar">
+                        <div class="table-left-tools">
+                            <span style="color:#666;">Show</span>
+                            <select style="padding: 3px 6px; border:1px solid #ccc; border-radius:3px; font-size:11px;">
+                                <option>10</option>
+                                <option>25</option>
+                                <option>50</option>
+                            </select>
+                            <span style="color:#666;">entries</span>
+
+                            <!-- STATUS TOMBOL AKTIF -->
+                            <span style="margin: 0 4px; color: #ccc;">|</span>
+
+                            <!-- PENGELOMPOK MODE TAMPILAN OPERATOR (THE CORE FEATURE) -->
+                            <div class="view-mode-toggle-group">
+                                <!-- Mode 1: Per Nota GRN Individual (Default) -->
+                                <button type="button" class="btn-view-mode active" id="btnModeNota" onclick="switchViewMode('NOTA')">
+                                    <span>📋 Mode Nota GRN</span>
+                                    <span class="badge-count" id="badgeNotaCount">174</span>
+                                </button>
+                                
+                                <!-- Mode 2: Ringkasan Per Supplier Yang Ada Saldo (The Operator's Choice) -->
+                                <button type="button" class="btn-view-mode highlight-mode" id="btnModeSupplier" onclick="switchViewMode('SUPPLIER')">
+                                    <span>🏢 Rekap Saldo Supplier</span>
+                                    <span class="badge-count" style="background:#b45309; color:#fff;">5 Ada Saldo</span>
+                                </button>
+                            </div>
+
+                            <!-- Indikator Filter Aktif -->
+                            <div id="filterPillContainer" style="display: none;">
+                                <div class="active-filter-badge">
+                                    <span>Supplier: <strong id="filterSupplierName">PT. PANASONIC GOBEL INDONESIA</strong></span>
+                                    <button class="btn-clear-filter" title="Reset / Tampilkan Semua Supplier" onclick="resetSupplierFilter()">✕</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-right-tools">
+                            <label style="color:#666; font-weight:700;">Search:</label>
+                            <input type="text" id="searchInput" placeholder="Cari GRN / Supplier..." style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 3px; font-size: 11px; width: 180px;" onkeyup="filterTableSearch(this.value)">
+                        </div>
+                    </div>
+
+                    <!-- ===================================================================== -->
+                    <!-- TAMPILAN 1: TABEL MODE NOTA GRN INDIVIDUAL (174 BARIS) -->
+                    <!-- ===================================================================== -->
+                    <div class="table-responsive" id="containerViewNota">
+                        <table class="erp-data-table" id="tableNota">
+                            <thead>
+                                <tr>
+                                    <th style="width: 28px;" class="text-center"><input type="checkbox" id="chkAll" onclick="toggleSelectAll(this)"></th>
+                                    <th style="width: 30px;" class="text-center">No.</th>
+                                    <th style="width: 115px;">Date</th>
+                                    <th>Supplier / Vendor</th>
+                                    <th style="width: 95px;">Nomer GRN</th>
+                                    <th style="width: 125px;">Nomer PO</th>
+                                    <th style="width: 50px;">Person</th>
+                                    <th class="text-right">Diskon 1</th>
+                                    <th class="text-right">Diskon 2</th>
+                                    <th class="text-right">Diskon 3</th>
+                                    <th class="text-right">Diskon 4</th>
+                                    <th class="text-right">Free Produk</th>
+                                    <th class="text-right" style="background: #f1f5f9;">Total Diskon</th>
+                                    <th class="text-center" style="width: 90px;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyNota">
+                                <!-- Baris-baris Nota GRN (Data realistis) -->
+                                <tr data-supplier="PANASONIC" data-amount="4850330" class="row-grn">
+                                    <td class="text-center"><input type="checkbox" class="chk-item" onchange="updateRowSelection(this)"></td>
+                                    <td class="text-center">1</td>
+                                    <td>29 Oct 2026 19:47</td>
+                                    <td class="font-bold">PT. PANASONIC GOBEL INDONESIA</td>
+                                    <td><strong class="text-blue">GRN.-1.5706</strong></td>
+                                    <td>PO.FG.-1.3657-03657</td>
+                                    <td>Alia</td>
+                                    <td class="text-right font-mono">3.114.836</td>
+                                    <td class="text-right font-mono">1.735.494</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono font-bold text-red" style="background:#f8fafc;">4.850.330</td>
+                                    <td class="text-center"><span class="tag-pill tag-warning">Belum Diklaim</span></td>
+                                </tr>
+                                <tr data-supplier="SHARP" data-amount="242000" class="row-grn">
+                                    <td class="text-center"><input type="checkbox" class="chk-item" onchange="updateRowSelection(this)"></td>
+                                    <td class="text-center">2</td>
+                                    <td>25 Oct 2026 11:58</td>
+                                    <td class="font-bold">PT. SHARP ELECTRONICS INDONESIA</td>
+                                    <td><strong class="text-blue">GRN.-1.5659</strong></td>
+                                    <td>PO.FG.-1.3639-03639</td>
+                                    <td>Alia</td>
+                                    <td class="text-right font-mono">96.800</td>
+                                    <td class="text-right font-mono">145.200</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono font-bold text-red" style="background:#f8fafc;">242.000</td>
+                                    <td class="text-center"><span class="tag-pill tag-warning">Belum Diklaim</span></td>
+                                </tr>
+                                <tr data-supplier="SAFKINDO" data-amount="2846880" class="row-grn">
+                                    <td class="text-center"><input type="checkbox" class="chk-item" onchange="updateRowSelection(this)"></td>
+                                    <td class="text-center">3</td>
+                                    <td>21 Oct 2026 16:45</td>
+                                    <td class="font-bold">PT SAFKINDO SAKTI</td>
+                                    <td><strong class="text-blue">GRN.-1.5634</strong></td>
+                                    <td>PO.FG.-1.3627-03627</td>
+                                    <td>Alia</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono">2.846.880</td>
+                                    <td class="text-right font-mono font-bold text-red" style="background:#f8fafc;">2.846.880</td>
+                                    <td class="text-center"><span class="tag-pill tag-warning">Belum Diklaim</span></td>
+                                </tr>
+                                <tr data-supplier="DAIKIN" data-amount="1332587" class="row-grn">
+                                    <td class="text-center"><input type="checkbox" class="chk-item" onchange="updateRowSelection(this)"></td>
+                                    <td class="text-center">4</td>
+                                    <td>15 Oct 2026 12:01</td>
+                                    <td class="font-bold">PT DAIKIN AIRCONDITIONING INDONESIA</td>
+                                    <td><strong class="text-blue">GRN.-1.5601</strong></td>
+                                    <td>PO.FG.-1.3595-03595</td>
+                                    <td>Alia</td>
+                                    <td class="text-right font-mono">1.332.587</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono font-bold text-red" style="background:#f8fafc;">1.332.587</td>
+                                    <td class="text-center"><span class="tag-pill tag-warning">Belum Diklaim</span></td>
+                                </tr>
+                                <tr data-supplier="PANASONIC" data-amount="956760" class="row-grn">
+                                    <td class="text-center"><input type="checkbox" class="chk-item" onchange="updateRowSelection(this)"></td>
+                                    <td class="text-center">5</td>
+                                    <td>07 Oct 2026 11:22</td>
+                                    <td class="font-bold">PT. PANASONIC GOBEL INDONESIA</td>
+                                    <td><strong class="text-blue">GRN.-1.5540</strong></td>
+                                    <td>PO.FG.-1.3493-03493</td>
+                                    <td>Alia</td>
+                                    <td class="text-right font-mono">956.760</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono font-bold text-red" style="background:#f8fafc;">956.760</td>
+                                    <td class="text-center"><span class="tag-pill tag-warning">Belum Diklaim</span></td>
+                                </tr>
+                                <tr data-supplier="PANASONIC" data-amount="266800" class="row-grn">
+                                    <td class="text-center"><input type="checkbox" class="chk-item" onchange="updateRowSelection(this)"></td>
+                                    <td class="text-center">6</td>
+                                    <td>06 Oct 2026 13:00</td>
+                                    <td class="font-bold">PT. PANASONIC GOBEL INDONESIA</td>
+                                    <td><strong class="text-blue">GRN.-1.5529</strong></td>
+                                    <td>PO.FG.-1.3491-03491</td>
+                                    <td>Alia</td>
+                                    <td class="text-right font-mono">266.800</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono font-bold text-red" style="background:#f8fafc;">266.800</td>
+                                    <td class="text-center"><span class="tag-pill tag-warning">Belum Diklaim</span></td>
+                                </tr>
+                                <tr data-supplier="PANASONIC" data-amount="3118300" class="row-grn">
+                                    <td class="text-center"><input type="checkbox" class="chk-item" onchange="updateRowSelection(this)"></td>
+                                    <td class="text-center">7</td>
+                                    <td>06 Oct 2026 10:53</td>
+                                    <td class="font-bold">PT. PANASONIC GOBEL INDONESIA</td>
+                                    <td><strong class="text-blue">GRN.-1.5523</strong></td>
+                                    <td>PO.FG.-1.3401-03401</td>
+                                    <td>Alia</td>
+                                    <td class="text-right font-mono">3.118.300</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono font-bold text-red" style="background:#f8fafc;">3.118.300</td>
+                                    <td class="text-center"><span class="tag-pill tag-warning">Belum Diklaim</span></td>
+                                </tr>
+                                <tr data-supplier="FACTORY" data-amount="409411" class="row-grn">
+                                    <td class="text-center"><input type="checkbox" class="chk-item" onchange="updateRowSelection(this)"></td>
+                                    <td class="text-center">8</td>
+                                    <td>03 Oct 2026 15:47</td>
+                                    <td class="font-bold">PT. FACTORY OUTLET ELEKTRONIKA</td>
+                                    <td><strong class="text-blue">GRN.-1.5513</strong></td>
+                                    <td>PO.FG.-1.3531-03531</td>
+                                    <td>Alia</td>
+                                    <td class="text-right font-mono">409.411</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono" style="color:#aaa;">0</td>
+                                    <td class="text-right font-mono font-bold text-red" style="background:#f8fafc;">409.411</td>
+                                    <td class="text-center"><span class="tag-pill tag-warning">Belum Diklaim</span></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background: #f1f5f9; font-weight: 700;">
+                                    <th colspan="7" class="text-right">TOTAL NILAI DISKON PADA HALAMAN INI:</th>
+                                    <th class="text-right font-mono">9.294.694</th>
+                                    <th class="text-right font-mono">1.880.694</th>
+                                    <th class="text-right font-mono">0</th>
+                                    <th class="text-right font-mono">0</th>
+                                    <th class="text-right font-mono">2.846.880</th>
+                                    <th class="text-right font-mono text-red" style="background:#e2e8f0;">14.022.268</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- ===================================================================== -->
+                    <!-- TAMPILAN 2: TABEL REKAP SALDO PER SUPPLIER (OPERATOR FOCUSED VIEW) -->
+                    <!-- ===================================================================== -->
+                    <div class="table-responsive" id="containerViewSupplier" style="display: none;">
+                        <table class="erp-data-table">
+                            <thead>
+                                <tr style="background:#e0f2fe;">
+                                    <th style="width: 35px;" class="text-center">No.</th>
+                                    <th>Nama Mitra Supplier / Vendor</th>
+                                    <th class="text-center" style="width: 80px;">Jml Nota</th>
+                                    <th class="text-right" style="width: 140px;">Hak Klaim (Debet)</th>
+                                    <th class="text-right" style="width: 140px;">Realisasi (Kredit)</th>
+                                    <th class="text-right" style="width: 160px; background:#fef3c7;">Sisa Saldo Aktif</th>
+                                    <th class="text-center" style="width: 90px;">% Realisasi</th>
+                                    <th class="text-center" style="width: 190px; background:#dcfce7;">Aksi Cepat Operator</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Supplier 1: Panasonic (Saldo Terbesar) -->
+                                <tr style="background:#fff;">
+                                    <td class="text-center font-bold">1</td>
+                                    <td>
+                                        <strong style="color: #0073b7; font-size: 12px;">PT. PANASONIC GOBEL INDONESIA</strong>
+                                        <div style="font-size: 10px; color: #64748b;">4 Nota GRN aktif &bull; Saldo piutang belum dicairkan</div>
+                                    </td>
+                                    <td class="text-center font-bold">4 Nota</td>
+                                    <td class="text-right font-mono">Rp 9.204.426</td>
+                                    <td class="text-right font-mono text-green">Rp 3.550.000</td>
+                                    <td class="text-right font-mono font-bold text-red" style="background:#fffbeb; font-size: 12px;">Rp 5.654.426</td>
+                                    <td class="text-center">
+                                        <span class="tag-pill tag-warning">38,5%</span>
+                                    </td>
+                                    <td class="text-center" style="background:#f0fdf4;">
+                                        <!-- ACTION BUTTON 1-KLIK PROSES -->
+                                        <button class="btn-select-vendor" onclick="quickFilterSupplier('PANASONIC', 'PT. PANASONIC GOBEL INDONESIA')">
+                                            <span>⚡</span> Pilih &amp; Tampilkan 4 Nota
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Supplier 2: Safkindo Sakti -->
+                                <tr style="background:#fff;">
+                                    <td class="text-center font-bold">2</td>
+                                    <td>
+                                        <strong style="color: #0073b7; font-size: 12px;">PT SAFKINDO SAKTI</strong>
+                                        <div style="font-size: 10px; color: #64748b;">1 Nota GRN (Free Produk)</div>
+                                    </td>
+                                    <td class="text-center font-bold">1 Nota</td>
+                                    <td class="text-right font-mono">Rp 2.846.880</td>
+                                    <td class="text-right font-mono text-green">Rp 0</td>
+                                    <td class="text-right font-mono font-bold text-red" style="background:#fffbeb; font-size: 12px;">Rp 2.846.880</td>
+                                    <td class="text-center">
+                                        <span class="tag-pill tag-danger">0%</span>
+                                    </td>
+                                    <td class="text-center" style="background:#f0fdf4;">
+                                        <button class="btn-select-vendor" onclick="quickFilterSupplier('SAFKINDO', 'PT SAFKINDO SAKTI')">
+                                            <span>⚡</span> Pilih &amp; Tampilkan 1 Nota
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Supplier 3: Daikin -->
+                                <tr style="background:#fff;">
+                                    <td class="text-center font-bold">3</td>
+                                    <td>
+                                        <strong style="color: #0073b7; font-size: 12px;">PT DAIKIN AIRCONDITIONING INDONESIA</strong>
+                                        <div style="font-size: 10px; color: #64748b;">1 Nota GRN (Diskon 1 Reguler)</div>
+                                    </td>
+                                    <td class="text-center font-bold">1 Nota</td>
+                                    <td class="text-right font-mono">Rp 1.332.587</td>
+                                    <td class="text-right font-mono text-green">Rp 0</td>
+                                    <td class="text-right font-mono font-bold text-red" style="background:#fffbeb; font-size: 12px;">Rp 1.332.587</td>
+                                    <td class="text-center">
+                                        <span class="tag-pill tag-danger">0%</span>
+                                    </td>
+                                    <td class="text-center" style="background:#f0fdf4;">
+                                        <button class="btn-select-vendor" onclick="quickFilterSupplier('DAIKIN', 'PT DAIKIN AIRCONDITIONING INDONESIA')">
+                                            <span>⚡</span> Pilih &amp; Tampilkan 1 Nota
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Supplier 4: Factory Outlet -->
+                                <tr style="background:#fff;">
+                                    <td class="text-center font-bold">4</td>
+                                    <td>
+                                        <strong style="color: #0073b7; font-size: 12px;">PT. FACTORY OUTLET ELEKTRONIKA</strong>
+                                        <div style="font-size: 10px; color: #64748b;">1 Nota GRN (Diskon 1 Reguler)</div>
+                                    </td>
+                                    <td class="text-center font-bold">1 Nota</td>
+                                    <td class="text-right font-mono">Rp 409.411</td>
+                                    <td class="text-right font-mono text-green">Rp 0</td>
+                                    <td class="text-right font-mono font-bold text-red" style="background:#fffbeb; font-size: 12px;">Rp 409.411</td>
+                                    <td class="text-center">
+                                        <span class="tag-pill tag-danger">0%</span>
+                                    </td>
+                                    <td class="text-center" style="background:#f0fdf4;">
+                                        <button class="btn-select-vendor" onclick="quickFilterSupplier('FACTORY', 'PT. FACTORY OUTLET ELEKTRONIKA')">
+                                            <span>⚡</span> Pilih &amp; Tampilkan 1 Nota
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Supplier 5: Sharp -->
+                                <tr style="background:#fff;">
+                                    <td class="text-center font-bold">5</td>
+                                    <td>
+                                        <strong style="color: #0073b7; font-size: 12px;">PT. SHARP ELECTRONICS INDONESIA</strong>
+                                        <div style="font-size: 10px; color: #64748b;">1 Nota GRN (Diskon 1 &amp; 2)</div>
+                                    </td>
+                                    <td class="text-center font-bold">1 Nota</td>
+                                    <td class="text-right font-mono">Rp 242.000</td>
+                                    <td class="text-right font-mono text-green">Rp 0</td>
+                                    <td class="text-right font-mono font-bold text-red" style="background:#fffbeb; font-size: 12px;">Rp 242.000</td>
+                                    <td class="text-center">
+                                        <span class="tag-pill tag-danger">0%</span>
+                                    </td>
+                                    <td class="text-center" style="background:#f0fdf4;">
+                                        <button class="btn-select-vendor" onclick="quickFilterSupplier('SHARP', 'PT. SHARP ELECTRONICS INDONESIA')">
+                                            <span>⚡</span> Pilih &amp; Tampilkan 1 Nota
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Baris Collapsible Saldo 0 (10 Vendor yang sudah lunas / nihil) -->
+                                <tr class="zero-balance-trigger" onclick="toggleZeroBalanceRows()">
+                                    <td class="text-center font-bold" id="iconZero">▶</td>
+                                    <td colspan="2">
+                                        <strong>DAFTAR MITRA DENGAN SALDO LUNAS / NIHIL (SALDO RP 0)</strong>
+                                        <span style="background:#cbd5e1; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; margin-left:6px;">10 Mitra Vendor</span>
+                                        <span style="font-size:10px; color:#64748b; font-style:italic; margin-left:6px;">(Klik untuk melihat daftar...)</span>
+                                    </td>
+                                    <td class="text-right font-mono">Rp 22.350.000</td>
+                                    <td class="text-right font-mono text-green font-bold">Rp 22.350.000</td>
+                                    <td class="text-right font-mono font-bold" style="color:#64748b;">Rp 0</td>
+                                    <td class="text-center font-bold text-green">100%</td>
+                                    <td class="text-center"><span class="tag-pill tag-success">LUNAS / NIHIL</span></td>
+                                </tr>
+
+                                <!-- Vendor Saldo 0 Tersembunyi -->
+                                <tr class="row-zero-hidden">
+                                    <td class="text-center" style="color:#94a3b8;">6</td>
+                                    <td><span style="color:#cbd5e1; margin-left:15px;">└─</span> PT. SAMSUNG ELECTRONICS INDONESIA</td>
+                                    <td class="text-center">5 Nota</td>
+                                    <td class="text-right font-mono">Rp 8.200.000</td>
+                                    <td class="text-right font-mono text-green">Rp 8.200.000</td>
+                                    <td class="text-right font-mono" style="color:#94a3b8;">Rp 0</td>
+                                    <td class="text-center">100%</td>
+                                    <td class="text-center" style="color:#94a3b8; font-size:10px;">Lunas Selesai</td>
+                                </tr>
+                                <tr class="row-zero-hidden">
+                                    <td class="text-center" style="color:#94a3b8;">7</td>
+                                    <td><span style="color:#cbd5e1; margin-left:15px;">└─</span> PT. LG ELECTRONICS INDONESIA</td>
+                                    <td class="text-center">3 Nota</td>
+                                    <td class="text-right font-mono">Rp 4.500.000</td>
+                                    <td class="text-right font-mono text-green">Rp 4.500.000</td>
+                                    <td class="text-right font-mono" style="color:#94a3b8;">Rp 0</td>
+                                    <td class="text-center">100%</td>
+                                    <td class="text-center" style="color:#94a3b8; font-size:10px;">Lunas Selesai</td>
+                                </tr>
+                                <tr class="row-zero-hidden">
+                                    <td class="text-center" style="color:#94a3b8;">8</td>
+                                    <td><span style="color:#cbd5e1; margin-left:15px;">└─</span> PT. POLYTRON (HARTONO ISTANA)</td>
+                                    <td class="text-center">2 Nota</td>
+                                    <td class="text-right font-mono">Rp 3.100.000</td>
+                                    <td class="text-right font-mono text-green">Rp 3.100.000</td>
+                                    <td class="text-right font-mono" style="color:#94a3b8;">Rp 0</td>
+                                    <td class="text-center">100%</td>
+                                    <td class="text-center" style="color:#94a3b8; font-size:10px;">Lunas Selesai</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background:#e2e8f0; font-weight:800;">
+                                    <th colspan="2" class="text-center">TOTAL KONSOLIDASI (REK 1010020030)</th>
+                                    <th class="text-center">23 Nota</th>
+                                    <th class="text-right font-mono">Rp 35.339.444</th>
+                                    <th class="text-right font-mono text-green">Rp 25.900.000</th>
+                                    <th class="text-right font-mono text-red" style="font-size:12px;">Rp 9.439.444</th>
+                                    <th class="text-center">73,29%</th>
+                                    <th class="text-center"><span class="tag-pill tag-success">BALANCE</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Paginasi & Info Box Bawah -->
+                    <div style="padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; background: #fafafa; border-top: 1px solid #eee;">
+                        <span style="color:#777; font-size:11px;" id="lblShowingText">Showing 1 to 8 of 8 entries (Hasil filter: 8 Nota)</span>
+                        <div style="display:flex; gap:4px;">
+                            <button style="padding:3px 8px; border:1px solid #ccc; background:#fff; border-radius:3px; font-size:11px; cursor:not-allowed;" disabled>Previous</button>
+                            <button style="padding:3px 8px; border:1px solid #0073b7; background:#0073b7; color:#fff; border-radius:3px; font-size:11px; font-weight:700;">1</button>
+                            <button style="padding:3px 8px; border:1px solid #ccc; background:#fff; border-radius:3px; font-size:11px; cursor:not-allowed;" disabled>Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================================================= -->
+                <!-- BLOK 2: RIWAYAT TRANSAKSI (TABEL BAWAH PERSIS SCREENSHOT REAL) -->
+                <!-- ========================================================================= -->
+                <div class="erp-box box-success">
+                    <div class="box-header" style="background:#e8f5e9;">
+                        <div class="box-title" style="color: #2e7d32;">
+                            <span>📑</span>
+                            <span>RIWAYAT TRANSAKSI (REALISASI KLAIM YANG SUDAH DITERBITKAN)</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <label style="font-size:11px; font-weight:700;">Search Riwayat:</label>
+                            <input type="text" placeholder="Cari No. Klaim / Ref..." style="padding:3px 8px; border:1px solid #ccc; border-radius:3px; font-size:11px;">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="erp-data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:30px;" class="text-center">No.</th>
+                                    <th style="width:115px;">Date</th>
+                                    <th>Supplier / Vendor</th>
+                                    <th style="width:130px;">Nomer Transaksi</th>
+                                    <th style="width:100px;">Nomor Ref GRN</th>
+                                    <th style="width:70px;">Person</th>
+                                    <th class="text-right">Amount (Gross)</th>
+                                    <th class="text-right">Nilai PPh 23</th>
+                                    <th class="text-right">Nilai Credit Note</th>
+                                    <th class="text-right" style="background:#e8f5e9;">Kas Dibayarkan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">1</td>
+                                    <td>21 Oct 2026 09:32</td>
+                                    <td class="font-bold">PE. BUKIT UTAMA LESTARI</td>
+                                    <td><strong class="text-blue">3333-1.0017-00417</strong></td>
+                                    <td>GRN.-1.5304</td>
+                                    <td>Purchasing</td>
+                                    <td class="text-right font-mono">4.500.000</td>
+                                    <td class="text-right font-mono">0</td>
+                                    <td class="text-right font-mono">0</td>
+                                    <td class="text-right font-mono font-bold text-green" style="background:#f1f8e9;">4.500.000</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">2</td>
+                                    <td>21 Oct 2026 09:30</td>
+                                    <td class="font-bold">PE. BUKIT UTAMA LESTARI</td>
+                                    <td><strong class="text-blue">3333-1.0016-00416</strong></td>
+                                    <td>GRN.-1.5288</td>
+                                    <td>Purchasing</td>
+                                    <td class="text-right font-mono">2.800.000</td>
+                                    <td class="text-right font-mono">0</td>
+                                    <td class="text-right font-mono">0</td>
+                                    <td class="text-right font-mono font-bold text-green" style="background:#f1f8e9;">2.800.000</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">3</td>
+                                    <td>20 Oct 2026 16:17</td>
+                                    <td class="font-bold">PE. PANASONIC GOBEL INDONESIA</td>
+                                    <td><strong class="text-blue">3333-1.0011-00411</strong></td>
+                                    <td>3344-1.116</td>
+                                    <td>Indah</td>
+                                    <td class="text-right font-mono">3.550.000</td>
+                                    <td class="text-right font-mono">0</td>
+                                    <td class="text-right font-mono">0</td>
+                                    <td class="text-right font-mono font-bold text-green" style="background:#f1f8e9;">3.550.000</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- JAVASCRIPT LOGIKA OPERATOR & SIMULASI 1-KLIK -->
+    <!-- ========================================================================= -->
+    <script>
+        // State Variabel
+        var currentMode = 'NOTA'; // 'NOTA' or 'SUPPLIER'
+        var activeFilterSupplier = 'ALL';
+
+        // 1. Fungsi Pergantian Mode Tampilan (Toggle Operator)
+        function switchViewMode(mode) {
+            currentMode = mode;
+            var btnNota = document.getElementById('btnModeNota');
+            var btnSupplier = document.getElementById('btnModeSupplier');
+            var containerNota = document.getElementById('containerViewNota');
+            var containerSupplier = document.getElementById('containerViewSupplier');
+
+            if (mode === 'SUPPLIER') {
+                btnSupplier.classList.add('active');
+                btnNota.classList.remove('active');
+                containerNota.style.display = 'none';
+                containerSupplier.style.display = 'block';
+
+                document.getElementById('lblShowingText').innerText = "Menampilkan 5 Mitra Supplier yang memiliki Saldo Aktif Piutang Klaim";
+                
+                // Update Step Wizard
+                document.getElementById('pillStep1').classList.remove('active');
+                document.getElementById('pillStep2').classList.add('active');
+            } else {
+                btnNota.classList.add('active');
+                btnSupplier.classList.remove('active');
+                containerNota.style.display = 'block';
+                containerSupplier.style.display = 'none';
+
+                applySupplierFilterToRows();
+            }
+        }
+
+        // 2. Fungsi 1-Klik: Pilih Supplier dari Mode Rekap dan langsung Tampilkan Notanya
+        function quickFilterSupplier(suppCode, suppName) {
+            activeFilterSupplier = suppCode;
+
+            // Set Dropdown di header
+            document.getElementById('selectSupplierBox').value = suppCode;
+
+            // Tampilkan badge filter aktif
+            document.getElementById('filterPillContainer').style.display = 'inline-flex';
+            document.getElementById('filterSupplierName').innerText = suppName;
+
+            // Beralih kembali ke Mode Nota
+            switchViewMode('NOTA');
+
+            // Update Step Wizard
+            document.getElementById('pillStep2').classList.remove('active');
+            document.getElementById('pillStep3').classList.add('active');
+        }
+
+        // 3. Dropdown Supplier Change Handlers
+        function onDropdownSupplierChange(val) {
+            activeFilterSupplier = val;
+            if (val === 'ALL') {
+                resetSupplierFilter();
+            } else {
+                var text = document.getElementById('selectSupplierBox').options[document.getElementById('selectSupplierBox').selectedIndex].text;
+                document.getElementById('filterPillContainer').style.display = 'inline-flex';
+                document.getElementById('filterSupplierName').innerText = text.split(' (Saldo:')[0];
+                switchViewMode('NOTA');
+            }
+        }
+
+        // 4. Reset Filter Supplier (Tampilkan Semua Nota Kembali)
+        function resetSupplierFilter() {
+            activeFilterSupplier = 'ALL';
+            document.getElementById('selectSupplierBox').value = 'ALL';
+            document.getElementById('filterPillContainer').style.display = 'none';
+            applySupplierFilterToRows();
+
+            document.getElementById('pillStep3').classList.remove('active');
+            document.getElementById('pillStep1').classList.add('active');
+        }
+
+        // 5. Terapkan Filter ke Baris-baris Nota
+        function applySupplierFilterToRows() {
+            var rows = document.querySelectorAll('.row-grn');
+            var visibleCount = 0;
+
+            rows.forEach(function(row) {
+                var rowSupp = row.getAttribute('data-supplier');
+                if (activeFilterSupplier === 'ALL' || rowSupp === activeFilterSupplier) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (activeFilterSupplier === 'ALL') {
+                document.getElementById('lblShowingText').innerText = "Showing 1 to " + visibleCount + " of " + visibleCount + " entries (Semua Nota)";
+            } else {
+                var suppName = document.getElementById('filterSupplierName').innerText;
+                document.getElementById('lblShowingText').innerText = "Showing 1 to " + visibleCount + " of " + visibleCount + " entries (Filter Khusus: " + suppName + ")";
+            }
+        }
+
+        // 6. Checkbox Check / Recalculate Live Selection Total
+        function updateRowSelection(chk) {
+            var row = chk.closest('tr');
+            if (chk.checked) {
+                row.classList.add('row-selected');
+            } else {
+                row.classList.remove('row-selected');
+            }
+            recalculateTotalSelection();
+        }
+
+        function toggleSelectAll(masterChk) {
+            var checkboxes = document.querySelectorAll('.row-grn:not([style*="display: none"]) .chk-item');
+            checkboxes.forEach(function(chk) {
+                chk.checked = masterChk.checked;
+                var row = chk.closest('tr');
+                if (masterChk.checked) {
+                    row.classList.add('row-selected');
+                } else {
+                    row.classList.remove('row-selected');
+                }
+            });
+            recalculateTotalSelection();
+        }
+
+        function recalculateTotalSelection() {
+            var selectedRows = document.querySelectorAll('.row-grn.row-selected');
+            var totalCount = selectedRows.length;
+            var totalAmount = 0;
+
+            selectedRows.forEach(function(row) {
+                var val = parseInt(row.getAttribute('data-amount'), 10) || 0;
+                totalAmount += val;
+            });
+
+            document.getElementById('lblSelectedCount').innerText = totalCount;
+            document.getElementById('lblSelectedTotal').innerText = formatRupiah(totalAmount);
+
+            var btn = document.getElementById('btnProsesTransaksi');
+            if (totalCount > 0) {
+                btn.removeAttribute('disabled');
+                document.getElementById('pillStep3').classList.remove('active');
+                document.getElementById('pillStep4').classList.add('active');
+            } else {
+                btn.setAttribute('disabled', 'disabled');
+                document.getElementById('pillStep4').classList.remove('active');
+            }
+        }
+
+        function formatRupiah(number) {
+            return "Rp " + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        // 7. Toggle Baris Saldo Nihil (Zero Balance)
+        function toggleZeroBalanceRows() {
+            var rows = document.querySelectorAll('.row-zero-hidden');
+            var icon = document.getElementById('iconZero');
+            var isHidden = rows[0].style.display === 'none' || rows[0].style.display === '';
+
+            rows.forEach(function(r) {
+                r.style.display = isHidden ? 'table-row' : 'none';
+            });
+
+            icon.innerText = isHidden ? '▼' : '▶';
+        }
+
+        // 8. Search Filter Cepat
+        function filterTableSearch(query) {
+            var q = query.toLowerCase();
+            var rows = document.querySelectorAll('.row-grn');
+            rows.forEach(function(row) {
+                var text = row.innerText.toLowerCase();
+                if (text.indexOf(q) > -1) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // 9. Alert Simulasi Sukses
+        function alertProsesSukses() {
+            var count = document.getElementById('lblSelectedCount').innerText;
+            var total = document.getElementById('lblSelectedTotal').innerText;
+            alert("✅ SIMULASI SUKSES!\n\nAnda telah memilih " + count + " nota klaim senilai " + total + ".\n\nSistem akan melanjutkan ke pembentukan draft transaksi #3333 dan mengunci (locker) nota-nota tersebut.");
+        }
+    </script>
+</body>
+</html>
+

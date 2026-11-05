@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockup UI Notifikasi Kasir - Penempatan di Kotak Merah (No Scroll)</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 12px;
+      color: #1e293b;
+      background-color: #0b1329;
+    }
+    .erp-input {
+      background-color: #f1f5f9;
+      border: 1px solid #94a3b8;
+      border-radius: 2px;
+      padding: 3px 6px;
+      text-align: right;
+      font-family: "Consolas", "Courier New", monospace;
+      font-weight: 600;
+      font-size: 12.5px;
+      width: 100%;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .erp-input:focus {
+      background-color: #ffffff;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+    .erp-input-yellow {
+      background-color: #fef08a !important;
+      border-color: #ca8a04 !important;
+      color: #854d0e !important;
+    }
+    .erp-input-cyan {
+      background-color: #e0f2fe !important;
+      border-color: #7dd3fc !important;
+      color: #0369a1 !important;
+    }
+    .erp-input-error {
+      border: 2px solid #dc2626 !important;
+      background-color: #fee2e2 !important;
+      color: #991b1b !important;
+      animation: pulseError 1.5s infinite;
+    }
+    @keyframes pulseError {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+      50% { box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.2); }
+    }
+    /* Actionable Guidance Styling (Rule 3.12) */
+    .guidance-panel {
+      border-radius: 6px;
+      padding: 12px 14px;
+      transition: all 0.25s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .state-info {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 2px solid #3b82f6;
+      color: #1e3a8a;
+    }
+    .state-warning {
+      background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+      border: 2px solid #ef4444;
+      color: #7f1d1d;
+    }
+    .state-success {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 2px solid #22c55e;
+      color: #14532d;
+    }
+    /* Modal Simulator */
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(1.5px);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="p-3 md:p-5 min-h-screen">
+
+  <div class="max-w-[1340px] mx-auto space-y-3">
+
+    <!-- Top Control Bar / UX Review Navigator -->
+    <div class="bg-slate-800 text-white px-4 py-2.5 rounded-lg border border-slate-700 flex flex-wrap items-center justify-between gap-3 shadow-md">
+      <div class="flex items-center gap-3">
+        <span class="px-2 py-0.5 text-[11px] font-bold rounded bg-amber-400 text-slate-900 tracking-wider">MOCKUP UI</span>
+        <h1 class="text-sm font-bold text-white tracking-wide">
+          Penempatan Notifikasi di Kotak Merah Samping Form Pembayaran (Bebas Scroll)
+        </h1>
+      </div>
+
+      <!-- Mode Switcher -->
+      <div class="flex items-center bg-slate-900 p-1 rounded-md border border-slate-700 text-xs">
+        <button id="btnProposed" onclick="setMode('proposed')" class="px-3 py-1 font-semibold rounded bg-emerald-600 text-white shadow transition">
+          🟢 Desain Baru (Kotak Merah Samping Form)
+        </button>
+        <button id="btnLegacy" onclick="setMode('legacy')" class="px-3 py-1 font-semibold rounded text-slate-400 hover:text-white transition">
+          🔴 Desain Lama (Popup Tengah Layar)
+        </button>
+      </div>
+    </div>
+
+    <!-- Info Banner Penggunaan -->
+    <div id="explainerBanner" class="px-3.5 py-2 rounded border text-xs bg-emerald-950/70 border-emerald-700/80 text-emerald-200 flex items-center justify-between">
+      <span>
+        👉 <strong>Posisi Kotak Merah:</strong> Panel petunjuk diletakkan tepat di sebelah kiri form pembayaran (sejajar dengan <em>Uang Muka</em> s/d <em>Diskon</em>). Kasir langsung melihat panduan tanpa perlu scroll atas-bawah.
+      </span>
+      <span class="text-[11px] bg-emerald-900/90 text-emerald-300 px-2 py-0.5 rounded font-mono">
+        Status: Bebas Scroll 1 Layar Penuh
+      </span>
+    </div>
+
+    <!-- ERP WINDOW BROWSER CONTAINER -->
+    <div class="relative bg-white rounded-lg shadow-2xl border border-slate-300 overflow-hidden">
+
+      <!-- Browser URL Bar Dummy (Everest ERP URL) -->
+      <div class="bg-slate-200 border-b border-slate-300 px-3 py-1.5 flex items-center gap-2 text-[11px] text-slate-600">
+        <span class="flex gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-400 inline-block"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
+        </span>
+        <div class="bg-white px-3 py-0.5 rounded border border-slate-300 flex-1 font-mono text-[11px] text-slate-700 flex items-center gap-1.5">
+          <span class="text-emerald-600 font-bold">🔒</span>
+          <span>everest.mayagrahakencana.com/kas/Transaksi/index/4464</span>
+        </div>
+      </div>
+
+      <!-- Blue Header Bar ERP -->
+      <div class="bg-gradient-to-r from-[#0d2746] via-[#153e6d] to-[#0d2746] text-white px-4 py-2 flex items-center justify-between border-b border-blue-950">
+        <div class="flex items-center gap-2 text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span class="tracking-wide">Penerimaan penjualan tunai - PT.PREVENTED OCEAN PLASTIC INDONESIA</span>
+        </div>
+        <div class="text-[11px] text-blue-200 flex items-center gap-3">
+          <span>Cabang: <strong>Pusat (01)</strong></span>
+          <span>User: <strong>Kasir</strong></span>
+        </div>
+      </div>
+
+      <!-- ERP Work Area -->
+      <div class="p-3 bg-[#f8fafc] space-y-2.5">
+
+        <!-- Legend Bar (Lunas / Dibayar, Belum Lunas / Tidak Dibayar) -->
+        <div class="flex items-center gap-2 text-[11px] font-semibold text-slate-700 bg-white p-1.5 rounded border border-slate-200 shadow-xs">
+          <span class="px-2 py-0.5 rounded bg-emerald-300 text-emerald-950">■ Lunas</span>
+          <span class="px-2 py-0.5 rounded bg-amber-300 text-amber-950">■ Dibayar, Belum Lunas</span>
+          <span class="px-2 py-0.5 rounded bg-red-400 text-white">■ Tidak Dibayar</span>
+          <span class="ml-auto text-slate-500 font-normal">2 Nota Sales Order Diproses</span>
+        </div>
+
+        <!-- 1. SO Item Table #1 (5822so.1.235.10) -->
+        <div class="border border-slate-300 rounded overflow-hidden shadow-xs bg-white">
+          <!-- SO Header Row (Green Bar) -->
+          <div class="bg-[#86efac] px-3 py-1.5 flex items-center justify-between text-xs font-bold text-slate-900 border-b border-emerald-300">
+            <div class="flex items-center gap-4">
+              <span class="w-5 h-5 rounded bg-white text-slate-800 flex items-center justify-center text-[11px] shadow-xs">1</span>
+              <span class="font-mono text-[12px]">5822so.1.235.10</span>
+            </div>
+            <div class="flex items-center gap-8 font-mono text-[12px]">
+              <span>Qty: <strong>1</strong></span>
+              <span>Sisa Tagihan: <strong>1,390,000</strong></span>
+              <span class="text-blue-900">Subtotal: <strong>1,390,000</strong></span>
+            </div>
+          </div>
+          <!-- Item Details Table 1 -->
+          <table class="w-full text-[11px] text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 border-b border-slate-200 text-[10.5px]">
+                <th class="py-1 px-2 text-center w-7">NO</th>
+                <th class="py-1 px-2">Produk</th>
+                <th class="py-1 px-2">SKU</th>
+                <th class="py-1 px-2 text-center">Qty</th>
+                <th class="py-1 px-2 text-center">Satuan</th>
+                <th class="py-1 px-2 text-right">Harga</th>
+                <th class="py-1 px-2 text-right">Diskon (%)</th>
+                <th class="py-1 px-2 text-right">Diskon (IDR)</th>
+                <th class="py-1 px-2 text-right">Harga(Net)</th>
+                <th class="py-1 px-2 text-right">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 font-mono text-[11.5px] text-slate-700">
+              <tr>
+                <td class="py-1 px-2 text-center font-sans">1</td>
+                <td class="py-1 px-2 font-sans font-medium text-slate-800">PIPA + KABEL AC</td>
+                <td class="py-1 px-2 text-slate-500">PP-13</td>
+                <td class="py-1 px-2 text-center font-bold">6</td>
+                <td class="py-1 px-2 text-center">16</td>
+                <td class="py-1 px-2 text-right">180,180</td>
+                <td class="py-1 px-2 text-right">0.00</td>
+                <td class="py-1 px-2 text-right">0</td>
+                <td class="py-1 px-2 text-right">180,180</td>
+                <td class="py-1 px-2 text-right font-bold text-slate-900">1,200,000</td>
+              </tr>
+              <tr>
+                <td class="py-1 px-2 text-center font-sans">2</td>
+                <td class="py-1 px-2 font-sans font-medium text-slate-800">KABEL POWER</td>
+                <td class="py-1 px-2 text-slate-500">PP-21</td>
+                <td class="py-1 px-2 text-center font-bold">1</td>
+                <td class="py-1 px-2 text-center">16</td>
+                <td class="py-1 px-2 text-right">72,072</td>
+                <td class="py-1 px-2 text-right text-red-600">50.00</td>
+                <td class="py-1 px-2 text-right text-red-600">36,036</td>
+                <td class="py-1 px-2 text-right">36,036</td>
+                <td class="py-1 px-2 text-right font-bold text-slate-900">40,000</td>
+              </tr>
+              <tr>
+                <td class="py-1 px-2 text-center font-sans">3</td>
+                <td class="py-1 px-2 font-sans font-medium text-slate-800">BRACKET DADO 2 PK - 2.5 PK</td>
+                <td class="py-1 px-2 text-slate-500">BD023001</td>
+                <td class="py-1 px-2 text-center font-bold">1</td>
+                <td class="py-1 px-2 text-center">N/A</td>
+                <td class="py-1 px-2 text-right">135,135</td>
+                <td class="py-1 px-2 text-right">0.00</td>
+                <td class="py-1 px-2 text-right">0</td>
+                <td class="py-1 px-2 text-right">135,135</td>
+                <td class="py-1 px-2 text-right font-bold text-slate-900">150,000</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="bg-slate-50 text-[11px] font-mono border-t border-slate-200">
+                <td colspan="5" class="py-1 px-2 font-sans text-slate-500 italic">Bruto: 1,288,288 | Diskon: 36,036</td>
+                <td colspan="5" class="py-1 px-2 text-right space-x-3">
+                  <span>Netto: <strong>1,252,252</strong></span>
+                  <span>PPN: <strong>137,747</strong></span>
+                  <span class="text-blue-900 font-bold">Grand Total: 1,390,000</span>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- 2. SO Item Table #4 (5822so.1.235.12) -->
+        <div class="border border-slate-300 rounded overflow-hidden shadow-xs bg-white">
+          <!-- SO Header Row (Green Bar) -->
+          <div class="bg-[#86efac] px-3 py-1.5 flex items-center justify-between text-xs font-bold text-slate-900 border-b border-emerald-300">
+            <div class="flex items-center gap-4">
+              <span class="w-5 h-5 rounded bg-white text-slate-800 flex items-center justify-center text-[11px] shadow-xs">4</span>
+              <span class="font-mono text-[12px]">5822so.1.235.12</span>
+            </div>
+            <div class="flex items-center gap-8 font-mono text-[12px]">
+              <span>Qty: <strong>1</strong></span>
+              <span>Sisa Tagihan: <strong>8,320,000</strong></span>
+              <span class="text-blue-900">Subtotal: <strong>8,320,000</strong></span>
+            </div>
+          </div>
+          <!-- Item Details Table 4 -->
+          <table class="w-full text-[11px] text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 border-b border-slate-200 text-[10.5px]">
+                <th class="py-1 px-2 text-center w-7">NO</th>
+                <th class="py-1 px-2">Produk</th>
+                <th class="py-1 px-2">SKU</th>
+                <th class="py-1 px-2 text-center">Qty</th>
+                <th class="py-1 px-2 text-center">Satuan</th>
+                <th class="py-1 px-2 text-right">Harga</th>
+                <th class="py-1 px-2 text-right">Diskon (%)</th>
+                <th class="py-1 px-2 text-right">Diskon (IDR)</th>
+                <th class="py-1 px-2 text-right">Harga(Net)</th>
+                <th class="py-1 px-2 text-right">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 font-mono text-[11.5px] text-slate-700">
+              <tr>
+                <td class="py-1 px-2 text-center font-sans">1</td>
+                <td class="py-1 px-2 font-sans font-medium text-slate-800">DAIKIN STC50YV</td>
+                <td class="py-1 px-2 text-slate-500">STC50YV</td>
+                <td class="py-1 px-2 text-center font-bold">1</td>
+                <td class="py-1 px-2 text-center">N/A</td>
+                <td class="py-1 px-2 text-right">6,954,955</td>
+                <td class="py-1 px-2 text-right">0.00</td>
+                <td class="py-1 px-2 text-right">0</td>
+                <td class="py-1 px-2 text-right">6,954,955</td>
+                <td class="py-1 px-2 text-right font-bold text-slate-900">7,720,000</td>
+              </tr>
+              <tr>
+                <td class="py-1 px-2 text-center font-sans">2</td>
+                <td class="py-1 px-2 font-sans font-medium text-slate-800">JASA BONGKAR AC</td>
+                <td class="py-1 px-2 text-slate-500">JSB49571</td>
+                <td class="py-1 px-2 text-center font-bold">1</td>
+                <td class="py-1 px-2 text-center">N/A</td>
+                <td class="py-1 px-2 text-right">270,270</td>
+                <td class="py-1 px-2 text-right text-red-600">66.67</td>
+                <td class="py-1 px-2 text-right text-red-600">180,180</td>
+                <td class="py-1 px-2 text-right">90,090</td>
+                <td class="py-1 px-2 text-right font-bold text-slate-900">100,000</td>
+              </tr>
+              <tr>
+                <td class="py-1 px-2 text-center font-sans">3</td>
+                <td class="py-1 px-2 font-sans font-medium text-slate-800">JASA PASANG 2 PK</td>
+                <td class="py-1 px-2 text-slate-500">JS-005</td>
+                <td class="py-1 px-2 text-center font-bold">1</td>
+                <td class="py-1 px-2 text-center">N/A</td>
+                <td class="py-1 px-2 text-right">900,901</td>
+                <td class="py-1 px-2 text-right text-red-600">50.00</td>
+                <td class="py-1 px-2 text-right text-red-600">450,450</td>
+                <td class="py-1 px-2 text-right">450,450</td>
+                <td class="py-1 px-2 text-right font-bold text-slate-900">500,000</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="bg-slate-50 text-[11px] font-mono border-t border-slate-200">
+                <td colspan="5" class="py-1 px-2 font-sans text-slate-500 italic">Bruto: 8,126,126 | Diskon: 630,630</td>
+                <td colspan="5" class="py-1 px-2 text-right space-x-3">
+                  <span>Netto: <strong>7,495,495</strong></span>
+                  <span>PPN: <strong>824,504</strong></span>
+                  <span class="text-blue-900 font-bold">Grand Total: 8,320,000</span>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- BOTTOM SECTION: KOTAK MERAH (KIRI) + FORM INPUT (KANAN) -->
+        <!-- ======================================================== -->
+        <div class="pt-2 border-t border-slate-300">
+          
+          <div class="grid grid-cols-12 gap-3 items-stretch">
+
+            <!-- AREA KOTAK MERAH: GUIDANCE PANEL DI SISI KIRI (COLS 8) -->
+            <div id="redBoxArea" class="col-span-12 lg:col-span-8 border-2 border-dashed border-red-500 bg-red-50/20 p-2.5 rounded-lg relative flex flex-col justify-between">
+              
+              <!-- Badge Penanda Posisi Kotak Merah -->
+              <div class="absolute -top-3 left-4 bg-red-600 text-white font-bold text-[10.5px] px-2 py-0.5 rounded shadow-sm flex items-center gap-1 tracking-wide">
+                <span>📍 AREA KOTAK MERAH (SEJAJAR DENGAN FORM INPUT)</span>
+              </div>
+
+              <!-- ISI KOTAK MERAH (DAPAT BERUBAH SECARA DINAMIS) -->
+              <div id="guidanceContent" class="h-full flex flex-col justify-between">
+
+                <!-- STATE 1: SEBELUM MENGISI (INFORMASI PROAKTIF DENGAN TOMBOL 1-KLIK) -->
+                <div id="stateInitial" class="guidance-panel state-info">
+                  <div>
+                    <div class="flex items-center justify-between pb-1.5 border-b border-blue-200">
+                      <div class="font-bold text-sm text-blue-900 flex items-center gap-1.5">
+                        <span class="text-base">💡</span>
+                        <span>Panduan Pelunasan Uang Muka (DP Konsumen)</span>
+                      </div>
+                      <span class="text-[11px] font-semibold bg-blue-200/80 text-blue-900 px-2 py-0.5 rounded-full">
+                        DP Tersedia
+                      </span>
+                    </div>
+
+                    <div class="mt-2 text-xs text-blue-950 space-y-1 leading-relaxed">
+                      <p>
+                        Konsumen memiliki Saldo Uang Muka sebesar <strong class="font-mono text-blue-900">Rp 10.012.200</strong>, sedangkan total tagihan transaksi ini adalah <strong class="font-mono text-blue-900">Rp 9.710.000</strong>.
+                      </p>
+                      <div class="bg-white/80 p-2 rounded border border-blue-200 flex items-center justify-between font-mono text-[11.5px] mt-1.5">
+                        <span>Batas Maksimal Penggunaan DP: <strong class="text-blue-900">Rp 9.710.000</strong></span>
+                        <span class="text-slate-500 font-sans text-[11px]">Sisa DP setelah dipotong: <strong>Rp 302.200</strong></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Pilar 3: Tombol Pintas Aksi Langsung 1-Klik -->
+                  <div class="pt-2 mt-2 border-t border-blue-200 flex items-center justify-between">
+                    <button onclick="applyFullDP()" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold text-xs shadow transition flex items-center gap-1.5">
+                      <span>⚡ Gunakan Uang Muka Penuh (Rp 9.710.000)</span>
+                    </button>
+                    <span class="text-[11px] text-blue-800 italic">
+                      *Cukup 1-klik, kasir tidak perlu mengetik manual
+                    </span>
+                  </div>
+                </div>
+
+                <!-- STATE 2: JIKA KASIR MENGETIK LEBIH DARI TAGIHAN (MISAL: 10,012,200) -->
+                <div id="stateError" class="guidance-panel state-warning hidden">
+                  <div>
+                    <div class="flex items-center justify-between pb-1.5 border-b border-red-200">
+                      <div class="font-bold text-sm text-red-900 flex items-center gap-1.5">
+                        <span class="text-base">⚠️</span>
+                        <span>Nominal Uang Muka Melebihi Total Tagihan!</span>
+                      </div>
+                      <span class="text-[11px] font-semibold bg-red-200 text-red-900 px-2 py-0.5 rounded-full">
+                        Perlu Penyesuaian
+                      </span>
+                    </div>
+
+                    <div class="mt-2 text-xs text-red-950 space-y-1.5 leading-relaxed">
+                      <p>
+                        Anda memasukkan <strong id="errInputVal" class="font-mono text-red-700 font-bold">10,012,200</strong> pada kolom <em>Uang Muka</em>. Angka tersebut adalah seluruh saldo konsumen, namun tagihan nota ini hanya sebesar <strong class="font-mono text-slate-900">Rp 9.710.000</strong>.
+                      </p>
+                      <div class="bg-white/80 p-2 rounded border border-red-300 font-mono text-[11.5px] text-red-900">
+                        Batas maksimal yang boleh dipotong untuk nota ini adalah <strong>Rp 9.710.000</strong>.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Aksi Perbaikan Cepat Langsung di Dalam Kotak -->
+                  <div class="pt-2 mt-2 border-t border-red-200 flex items-center gap-2">
+                    <button onclick="applyFullDP()" class="px-3 py-1.5 bg-red-700 hover:bg-red-800 text-white rounded font-bold text-xs shadow transition flex items-center gap-1">
+                      <span>✓ Sesuaikan Menjadi Rp 9.710.000</span>
+                    </button>
+                    <button onclick="resetDP()" class="px-2.5 py-1.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded font-semibold text-xs transition">
+                      Batal / Isi 0
+                    </button>
+                    <span class="text-[11px] text-red-800 ml-auto">
+                      *Bukti input tetap terlihat di kotak isian (border merah)
+                    </span>
+                  </div>
+                </div>
+
+                <!-- STATE 3: SETELAH SUKSES DITERAPKAN (HIJAU LENGKAP) -->
+                <div id="stateSuccess" class="guidance-panel state-success hidden">
+                  <div>
+                    <div class="flex items-center justify-between pb-1.5 border-b border-emerald-200">
+                      <div class="font-bold text-sm text-emerald-900 flex items-center gap-1.5">
+                        <span class="text-base">✅</span>
+                        <span>Uang Muka Berhasil Diterapkan Sebesar Rp 9.710.000</span>
+                      </div>
+                      <span class="text-[11px] font-semibold bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full">
+                        Lunas Sempurna
+                      </span>
+                    </div>
+
+                    <div class="mt-2 text-xs text-emerald-950 space-y-1 leading-relaxed">
+                      <p>
+                        Seluruh tagihan penjualan ini telah ditutup lunas menggunakan saldo DP konsumen.
+                      </p>
+                      <div class="bg-white/80 p-2 rounded border border-emerald-200 grid grid-cols-3 gap-2 font-mono text-[11.5px] text-center mt-1.5">
+                        <div>
+                          <span class="block text-[10.5px] text-slate-500 font-sans">Total Tagihan:</span>
+                          <strong>9,710,000</strong>
+                        </div>
+                        <div>
+                          <span class="block text-[10.5px] text-slate-500 font-sans">DP Dipakai:</span>
+                          <strong class="text-emerald-700">9,710,000</strong>
+                        </div>
+                        <div>
+                          <span class="block text-[10.5px] text-slate-500 font-sans">Sisa Saldo DP:</span>
+                          <strong class="text-blue-700">302,200</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="pt-2 mt-2 border-t border-emerald-200 flex items-center justify-between text-[11px] text-emerald-800">
+                    <span>Tagihan bersih kas (Netto) menjadi <strong>Rp 0</strong>. Transaksi siap disimpan.</span>
+                    <button onclick="resetDP()" class="text-emerald-700 hover:underline font-semibold">
+                      Ubah / Hapus DP
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- AREA KANAN: FORM INPUT ASLI EVEREST ERP (COLS 4) -->
+            <div class="col-span-12 lg:col-span-4 bg-[#e2e8f0] p-2.5 rounded-lg border border-slate-300 space-y-1.5 text-xs">
+              
+              <!-- 1. Subtotal -->
+              <div class="flex items-center justify-between gap-2">
+                <label class="w-36 text-slate-700 font-bold text-right text-[11px]">Subtotal</label>
+                <input type="text" class="erp-input font-bold text-slate-700 bg-slate-200 w-36" value="9,710,000" readonly>
+              </div>
+
+              <!-- 2. Uang Muka (KOLOM KUNING) -->
+              <div class="flex items-center justify-between gap-2">
+                <div class="w-36 text-right leading-tight">
+                  <label for="inputUangMuka" class="font-bold text-slate-900 block text-[11px]">Uang Muka</label>
+                  <span class="text-[10px] text-slate-500 font-mono">Saldo: 10,012,200</span>
+                </div>
+                <div class="w-36 relative">
+                  <input type="text" id="inputUangMuka" class="erp-input erp-input-yellow" value="0" placeholder="0" onblur="handleInputBlur(this.value)" onkeydown="if(event.key==='Enter') handleInputBlur(this.value)">
+                </div>
+              </div>
+
+              <!-- 3. Credit Note(Deposit) Return -->
+              <div class="flex items-center justify-between gap-2">
+                <div class="w-36 text-right leading-tight">
+                  <label class="font-medium text-slate-600 block text-[11px]">Credit Note (Deposit)</label>
+                  <span class="text-[10px] text-slate-400 font-mono">Saldo: 0</span>
+                </div>
+                <input type="text" class="erp-input erp-input-cyan w-36" value="0" readonly>
+              </div>
+
+              <!-- 4. Potongan Pph23 -->
+              <div class="flex items-center justify-between gap-2">
+                <label class="w-36 text-slate-600 font-medium text-right text-[11px]">Potongan Pph23</label>
+                <input type="text" class="erp-input erp-input-cyan w-36" value="0" readonly>
+              </div>
+
+              <!-- 5. Diskon (Biaya Suport) -->
+              <div class="flex items-center justify-between gap-2">
+                <label class="w-36 text-slate-600 font-medium text-right text-[11px]">Diskon (Biaya Suport)</label>
+                <input type="text" class="erp-input erp-input-cyan w-36" value="0" readonly>
+              </div>
+
+              <!-- 6. Netto -->
+              <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-300">
+                <label class="w-36 text-slate-800 font-bold text-right text-[11px]">Netto</label>
+                <input type="text" id="inputNetto" class="erp-input font-bold text-slate-800 bg-slate-200 w-36" value="9,710,000" readonly>
+              </div>
+
+              <!-- 7. Cash Received -->
+              <div class="flex items-center justify-between gap-2">
+                <label class="w-36 text-slate-900 font-bold text-right text-[11px]">Cash Received</label>
+                <input type="text" id="inputCash" class="erp-input font-bold text-blue-900 bg-white w-36" value="9,710,000">
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- POPUP MODAL SIMULATOR (HANYA AKTIF SAAT MODE LEGACY) -->
+      <div id="legacyModal" class="modal-backdrop hidden">
+        <div class="bg-white rounded-lg shadow-2xl border border-slate-300 max-w-sm w-full p-5 text-center space-y-3">
+          <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 mx-auto flex items-center justify-center font-bold text-xl">
+            !
+          </div>
+          <div class="text-xs text-slate-700 leading-relaxed">
+            <p>Total tagihan sebesar <strong>9,710,000</strong>, Anda mengisi <strong class="text-red-600">10,012,200</strong>, maksimal yang boleh diisi sebesar <strong>9,710,000</strong>.</p>
+            <p class="mt-1 text-slate-800 font-medium">Silahkan diisi sebesar tagihan yaitu 9,710,000.</p>
+            <div class="text-[10px] text-slate-400 font-mono mt-2">
+              code: 2863<br>
+              2026-11-04 10:34:50 everest.mayagrahakencana.com
+            </div>
+          </div>
+          <div>
+            <button onclick="closeLegacyModal()" class="px-6 py-1.5 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700">
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footnote Evaluasi -->
+    <div class="bg-slate-900/90 text-slate-300 p-3 rounded-lg border border-slate-800 text-[11.5px] flex items-center justify-between">
+      <div>
+        <strong>📌 Ringkasan Solusi UI:</strong> Dengan memanfaatkan ruang kosong di sebelah kiri form pembayaran (area kotak merah), 
+        notifikasi tidak memotong tabel barang di atas, tidak mengunci layar dengan pop-up modal, dan menjaga halaman tetap pas dalam satu layar tanpa scroll vertikal.
+      </div>
+      <div class="text-amber-400 font-mono font-semibold whitespace-nowrap ml-4">
+        Rule 3.12 Compliant
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let activeMode = 'proposed'; // 'proposed' or 'legacy'
+    const tagihanTotal = 9710000;
+    const saldoDP = 10012200;
+
+    function formatNumber(num) {
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function parseNumber(str) {
+      return parseInt(str.toString().replace(/,/g, ''), 10) || 0;
+    }
+
+    function setMode(mode) {
+      activeMode = mode;
+      const btnProp = document.getElementById('btnProposed');
+      const btnLeg = document.getElementById('btnLegacy');
+      const banner = document.getElementById('explainerBanner');
+      const redBox = document.getElementById('redBoxArea');
+
+      resetDP();
+
+      if (mode === 'proposed') {
+        btnProp.className = "px-3 py-1 font-semibold rounded bg-emerald-600 text-white shadow transition";
+        btnLeg.className = "px-3 py-1 font-semibold rounded text-slate-400 hover:text-white transition";
+        banner.className = "px-3.5 py-2 rounded border text-xs bg-emerald-950/70 border-emerald-700/80 text-emerald-200 flex items-center justify-between";
+        banner.innerHTML = "<span>👉 <strong>Posisi Kotak Merah:</strong> Panel petunjuk berada tepat di sebelah kiri form pembayaran. Kasir langsung melihat panduan tanpa scroll.</span><span class='text-[11px] bg-emerald-900/90 text-emerald-300 px-2 py-0.5 rounded font-mono'>Status: Bebas Scroll</span>";
+        redBox.style.display = "flex";
+      } else {
+        btnLeg.className = "px-3 py-1 font-semibold rounded bg-red-600 text-white shadow transition";
+        btnProp.className = "px-3 py-1 font-semibold rounded text-slate-400 hover:text-white transition";
+        banner.className = "px-3.5 py-2 rounded border text-xs bg-red-950/70 border-red-700/80 text-red-200 flex items-center justify-between";
+        banner.innerHTML = "<span>⚠️ <strong>Mode Desain Lama:</strong> Kotak merah disembunyikan. Coba ketik <code>10012200</code> pada kolom Uang Muka lalu klik di luar untuk melihat pop-up modal dan input terhapus jadi 0.</span><span class='text-[11px] bg-red-900/90 text-red-300 px-2 py-0.5 rounded font-mono'>Status: Modal Blocking</span>";
+        redBox.style.display = "none";
+      }
+    }
+
+    function handleInputBlur(valStr) {
+      const val = parseNumber(valStr);
+      const inputEl = document.getElementById('inputUangMuka');
+
+      if (activeMode === 'legacy') {
+        // PERILAKU LAMA:
+        if (val > tagihanTotal) {
+          // Reset ke 0 diam-diam
+          inputEl.value = "0";
+          updatePaymentOutputs(0);
+          // Munculkan popup SweetAlert
+          document.getElementById('legacyModal').classList.remove('hidden');
+        } else {
+          inputEl.value = formatNumber(val);
+          updatePaymentOutputs(val);
+        }
+      } else {
+        // PERILAKU BARU (KOTAK MERAH PROAKTIF & SOLUTIF):
+        if (val > tagihanTotal) {
+          // BUKTI TIDAK DIHAPUS: Pertahankan nilai salah ketik agar user sadar
+          inputEl.value = formatNumber(val);
+          inputEl.classList.add('erp-input-error');
+
+          // Ubah isi kotak merah menjadi State Error
+          document.getElementById('errInputVal').textContent = formatNumber(val);
+          showState('stateError');
+          updatePaymentOutputs(0);
+        } else if (val === tagihanTotal) {
+          inputEl.value = formatNumber(val);
+          inputEl.classList.remove('erp-input-error');
+          showState('stateSuccess');
+          updatePaymentOutputs(val);
+        } else {
+          inputEl.value = formatNumber(val);
+          inputEl.classList.remove('erp-input-error');
+          showState('stateInitial');
+          updatePaymentOutputs(val);
+        }
+      }
+    }
+
+    function applyFullDP() {
+      const inputEl = document.getElementById('inputUangMuka');
+      inputEl.value = formatNumber(tagihanTotal);
+      inputEl.classList.remove('erp-input-error');
+      
+      showState('stateSuccess');
+      updatePaymentOutputs(tagihanTotal);
+    }
+
+    function resetDP() {
+      const inputEl = document.getElementById('inputUangMuka');
+      inputEl.value = "0";
+      inputEl.classList.remove('erp-input-error');
+
+      showState('stateInitial');
+      updatePaymentOutputs(0);
+    }
+
+    function showState(stateId) {
+      document.getElementById('stateInitial').classList.add('hidden');
+      document.getElementById('stateError').classList.add('hidden');
+      document.getElementById('stateSuccess').classList.add('hidden');
+
+      document.getElementById(stateId).classList.remove('hidden');
+    }
+
+    function updatePaymentOutputs(dpUsed) {
+      const netto = Math.max(0, tagihanTotal - dpUsed);
+      document.getElementById('inputNetto').value = formatNumber(netto);
+      document.getElementById('inputCash').value = formatNumber(netto);
+    }
+
+    function closeLegacyModal() {
+      document.getElementById('legacyModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

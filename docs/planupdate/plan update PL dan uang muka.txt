@@ -1,0 +1,8 @@
+
+
+PLAN UPDATE PACKINGLIST
+
+- jika menggunakan uang muka dengan pajak
+   ->wajib di interchance pembantu ke uangmuka kontijensi(berelasi so)
+   ->tetap terbit A/R
+   ->pelunasan hanya mengguankan uang muka kontijensi 

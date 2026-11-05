@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 32" width="115" height="26">
+  <!-- Pita Emas Khas Mandiri -->
+  <path d="M86 3 C98 3 110 7 116 13 C108 10 98 10 90 12 C82 14 77 18 73 24 C71 20 71 14 74 10 C77 6 81 3 86 3 Z" fill="#f5a623"/>
+  <path d="M92 5 C102 5 112 8 116 14 C109 12 100 12 93 14 C86 16 82 19 78 24 C77 21 77 16 79 12 C83 8 87 5 92 5 Z" fill="#ffc836"/>
+  <!-- Tulisan mandiri warna navy -->
+  <text x="2" y="23" fill="#002d62" font-family="'Segoe UI', 'Trebuchet MS', Arial, sans-serif" font-weight="bold" font-size="22" letter-spacing="-0.5">mandırı</text>
+</svg>

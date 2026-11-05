@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 115 32" width="95" height="26">
+  <g transform="translate(1, 2)">
+    <!-- Perisai Biru BCA -->
+    <rect x="0" y="0" width="28" height="28" rx="6" fill="#005baa"/>
+    <!-- Lambang 3 kurva khas BCA -->
+    <path d="M14 6 C9.5 6 6 9.5 6 14 C6 18.5 9.5 22 14 22 C17.2 22 19.8 20.2 21 17.6 C20.3 18 19.3 18.3 18.2 18.3 C15.1 18.3 12.6 15.8 12.6 12.7 C12.6 9.8 14.7 7.4 17.5 7 C16.5 6.4 15.3 6 14 6 Z" fill="#ffffff"/>
+    <path d="M14 9.2 C11.4 9.2 9.2 11.4 9.2 14 C9.2 16.6 11.4 18.8 14 18.8 C15.8 18.8 17.3 17.7 18 16.2 C17.3 16.5 16.5 16.7 15.6 16.7 C13.7 16.7 12.1 15.1 12.1 13.2 C12.1 11.4 13.4 9.9 15.1 9.4 C14.7 9.3 14.4 9.2 14 9.2 Z" fill="#005baa"/>
+    <circle cx="14" cy="14" r="2.2" fill="#ffffff"/>
+  </g>
+  <!-- Tulisan BCA -->
+  <text x="36" y="22" fill="#005baa" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="21" letter-spacing="1">BCA</text>
+</svg>

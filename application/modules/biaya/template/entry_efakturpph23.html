@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alur Proses Entry e-Faktur / e-Bupot PPh 23 (Langkah 1–3)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    background: linear-gradient(135deg, #eef2f7 0%, #dfe7f1 100%);
+    padding: 30px 15px;
+    color: #2c3e50;
+  }
+  h1 {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 6px;
+    color: #1a3c5e;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: #6b7c93;
+    margin-bottom: 26px;
+  }
+  .diagram-wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px 18px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    overflow-x: auto;      /* agar bisa digeser bila layar kecil */
+  }
+  .mermaid { min-width: 1100px; }
+  .note {
+    max-width: 1400px;
+    margin: 18px auto 0;
+    font-size: 13px;
+    color: #7a5c00;
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    padding: 12px 16px;
+    border-radius: 8px;
+  }
+  .legend {
+    max-width: 1400px;
+    margin: 16px auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+    font-size: 13px;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+</style>
+</head>
+<body>
+
+  <h1>Alur Proses Entry e-Faktur / e-Bupot PPh 23</h1>
+  <p class="subtitle">Langkah 1 &rarr; 2 &rarr; 3 (sampai entry &amp; generate e-Bupot)</p>
+
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+flowchart LR
+    %% ===== Baris utama (horizontal) =====
+    A([Mulai]) --> B[1. Biaya / Biaya Umum Pusat]
+    B --> C[2. Pembayaran / Expense Payment]
+    C --> D[3. Tax / Setor Hutang PPh 23]
+    D --> F([Selesai])
+
+    %% ===== Keterangan di bawah masing-masing menu =====
+    B -.-> B1[• Input data biaya/tagihan vendor<br/>• Pengakuan nilai biaya &amp; hutang vendor]
+    C -.-> C1[• Pilih tagihan yang akan dibayar<br/>• Proses pembayaran ke vendor<br/>• Update status hutang menjadi lunas]
+    D -.-> D1[• Entry data e-Faktur / e-Bupot PPh 23<br/>• Validasi &amp; generate dokumen e-Bupot]
+
+    %% ===== Styling =====
+    style A fill:#4CAF50,color:#fff
+    style B fill:#2196F3,color:#fff
+    style C fill:#FF9800,color:#fff
+    style D fill:#9C27B0,color:#fff
+    style F fill:#4CAF50,color:#fff
+
+    style B1 fill:#e3f2fd,stroke:#2196F3,color:#0d47a1,text-align:left
+    style C1 fill:#fff3e0,stroke:#FF9800,color:#e65100,text-align:left
+    style D1 fill:#f3e5f5,stroke:#9C27B0,color:#4a148c,text-align:left
+    </pre>
+  </div>
+
+  <div class="legend">
+    <span><i class="dot" style="background:#4CAF50"></i> Mulai / Selesai</span>
+    <span><i class="dot" style="background:#2196F3"></i> Langkah 1 – Biaya</span>
+    <span><i class="dot" style="background:#FF9800"></i> Langkah 2 – Pembayaran</span>
+    <span><i class="dot" style="background:#9C27B0"></i> Langkah 3 – Tax / e-Bupot</span>
+    <span><i class="dot" style="background:#e3f2fd;border:1px solid #2196F3"></i> Keterangan sub-langkah</span>
+  </div>
+
+  <div class="note">
+    <b>Catatan:</b> Proses dihentikan sampai <b>Langkah 3</b> (entry data &amp; generate dokumen e-Bupot PPh 23). 
+    Tahap penyetoran PPh 23 ke kas negara tidak termasuk dalam diagram ini. 
+    Garis putus-putus (<code>-.-&gt;</code>) menunjukkan keterangan sub-langkah, bukan alur proses.
+  </div>
+
+  <!-- Mermaid CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      flowchart: {
+        curve: 'basis',
+        nodeSpacing: 40,
+        rankSpacing: 60,
+        htmlLabels: true
+      },
+      themeVariables: {
+        fontFamily: "'Segoe UI', Tahoma, Arial, sans-serif",
+        fontSize: '14px'
+      }
+    });
+  </script>
+
+</body>
+</html>

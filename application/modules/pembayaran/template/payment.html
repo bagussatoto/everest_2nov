@@ -1,0 +1,200 @@
+<script>
+    getData('{base}{modul}/_shoppingCart/viewCart/{jenisTr}?ohyes=ohno','shopping_cart');
+</script>
+
+<style>
+    /* Styling scrollbar elegan dan responsif untuk inline drawer & tab mutasi */
+    #content_drawer_mutasi, #content_tab_mutasi {
+        max-height: 65vh;
+        min-height: 400px;
+        overflow-y: auto;
+        overflow-x: auto;
+        padding: 8px;
+        position: relative;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: #00a65a #f1f1f1;
+    }
+
+    /* Ukuran minimal tabel agar tidak terjepit dan memicu scroll horizontal jika layar sempit */
+    #content_drawer_mutasi table, #content_tab_mutasi table {
+        min-width: 980px !important;
+        width: 100% !important;
+    }
+
+    /* Sticky Table Header agar baris judul kolom tetap terlihat saat scroll ke bawah */
+    #content_drawer_mutasi table thead th,
+    #content_tab_mutasi table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        box-shadow: inset 0 -1px 0 #ccc;
+    }
+
+    #content_drawer_mutasi table th, #content_drawer_mutasi table td,
+    #content_tab_mutasi table th, #content_tab_mutasi table td {
+        white-space: nowrap !important;
+    }
+    #content_drawer_mutasi table td:nth-child(2), #content_tab_mutasi table td:nth-child(2) {
+        white-space: normal !important;
+        min-width: 180px;
+    }
+
+    #content_drawer_mutasi::-webkit-scrollbar,
+    #content_tab_mutasi::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    #content_drawer_mutasi::-webkit-scrollbar-track,
+    #content_tab_mutasi::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+    #content_drawer_mutasi::-webkit-scrollbar-thumb {
+        background: #00c0ef;
+        border-radius: 4px;
+    }
+    #content_drawer_mutasi::-webkit-scrollbar-thumb:hover {
+        background: #0097bc;
+    }
+    #content_tab_mutasi::-webkit-scrollbar-thumb {
+        background: #00a65a;
+        border-radius: 4px;
+    }
+    #content_tab_mutasi::-webkit-scrollbar-thumb:hover {
+        background: #008d4c;
+    }
+
+    /* Container toolbar deretan tombol saldo supplier (flexbox rapi & responsive) */
+    #container_saldo_supplier {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        clear: both;
+        width: 100%;
+        margin-top: 5px;
+        margin-bottom: 12px;
+    }
+    #container_saldo_supplier .btn-group {
+        margin-bottom: 4px;
+    }
+
+    /* Pastikan drawer mutasi selalu menempati baris penuh di bawah tombol tanpa terpengaruh float */
+    #drawer_mutasi_hutang {
+        clear: both !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+</style>
+
+<div class="panel panel-body" style="padding: 10px 15px;">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="ap_payment_nav_tabs" role="tablist" style="margin-bottom: 12px; font-weight: bold;">
+        <li role="presentation" class="active" id="tab_header_pelunasan">
+            <a href="#tab_pelunasan_ap" aria-controls="tab_pelunasan_ap" role="tab" data-toggle="tab">
+                <i class="fa fa-file-text-o text-primary"></i> Formulir Pelunasan Pembayaran A/P
+            </a>
+        </li>
+        <li role="presentation" id="tab_header_mutasi">
+            <a href="#tab_mutasi_lengkap" aria-controls="tab_mutasi_lengkap" role="tab" data-toggle="tab" onclick="loadCurrentMutasiTab();">
+                <i class="fa fa-book text-success"></i> <span id="label_tab_mutasi_header">Kartu Mutasi Supplier (Buku Pembantu)</span>
+            </a>
+        </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <!-- TAB 1: FORMULIR PELUNASAN A/P -->
+        <div role="tabpanel" class="tab-pane active" id="tab_pelunasan_ap">
+            <!-- BARIS 1: JUDUL NOTA PEMBAYARAN -->
+            <div style="margin-top: 5px; margin-bottom: 10px; clear: both;">
+                <h4 class="text-blue" style="margin: 0; font-weight: bold;">
+                    {title} <span class="text-muted"><span class="glyphicon glyphicon-menu-right" style="font-size: 13px;"></span> {sub_title}</span>
+                </h4>
+            </div>
+
+            <!-- BARIS 2: TOOLBAR DERETAN TOMBOL SALDO SUPPLIER (FLEXBOX RESPONSIF) -->
+            <div id="container_saldo_supplier">
+                {saldo}
+            </div>
+
+            <!-- BARIS 3: INLINE DRAWER MUTASI REKENING (DINAMIS & LEBAR PENUH 100%) -->
+            <div id="drawer_mutasi_hutang" style="display:none; clear: both !important; width: 100% !important; margin-bottom: 16px; border: 2px solid #00c0ef; border-radius: 4px; background: #fff; box-shadow: 0 3px 12px rgba(0,0,0,0.12);">
+                <div style="background: #00c0ef; color: #fff; padding: 8px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; width: 100%;">
+                    <div style="font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa fa-book" style="font-size: 15px;"></i>
+                        <span id="label_drawer_mutasi_title">Ringkasan Mutasi Supplier</span>: <span style="color: #eaf8ff;">{sub_title}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <a href="#" id="link_drawer_mutasi_full" target="_blank" class="btn btn-default btn-xs" style="font-weight: bold; border-radius: 3px; color: #0073b7; padding: 4px 8px;" title="Buka Halaman Lengkap Mutasi di Tab Baru Browser">
+                            <i class="fa fa-external-link"></i> Buka Halaman Lengkap (Tab Baru)
+                        </a>
+                        <button type="button" class="btn btn-default btn-xs" onclick="switchToMutasiTab();" style="font-weight: bold; border-radius: 3px; padding: 4px 8px;" title="Lihat di Tab Navigasi Penuh">
+                            <i class="fa fa-expand"></i> Buka di Tab Penuh
+                        </button>
+                        <button type="button" class="btn btn-default btn-xs" onclick="closeMutasiDrawer();" style="font-weight: bold; border-radius: 3px; padding: 4px 8px;" title="Tutup Drawer">
+                            <i class="fa fa-times"></i> Tutup
+                        </button>
+                    </div>
+                </div>
+                <div id="content_drawer_mutasi" style="width: 100%;">
+                    <div class="text-center text-muted" style="padding: 25px;">
+                        <i class="fa fa-spinner fa-spin fa-2x text-info"></i><br>
+                        <span style="font-size: 12px; margin-top: 6px; display: inline-block;">Memuat riwayat mutasi...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 no-padding">
+                <div class="box box-solidddd box-default">
+                    <div class="box-body no-padding table-responsive">{content}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 no-padding">
+                <div class="box box-solidddd box-default">
+                    <div class="box-header">
+                        <span class="pull-left"></span>
+                    </div>
+                    <div class="box-body" id="shopping_cart">{elements}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 no-padding">
+                <div class="box box-solidddd box-info">
+                    <div class="box-header">
+                        <span class="pull-left">{payment_subtitle}</span>
+                    </div>
+                    <div class="box-body">{payment_str}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: KARTU MUTASI LENGKAP -->
+        <div role="tabpanel" class="tab-pane" id="tab_mutasi_lengkap" style="padding-top: 10px;">
+            <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+                <h4 class="text-blue" style="margin: 0;">
+                    <i class="fa fa-book text-success"></i> <span id="label_tab_mutasi_title">Kartu Mutasi Supplier</span>: <span class="text-muted">{sub_title}</span>
+                </h4>
+                <div>
+                    <a href="#" id="link_tab_mutasi_full" target="_blank" class="btn btn-info btn-sm" style="font-weight: bold; border-radius: 4px; margin-right: 5px;" title="Buka Halaman Lengkap Mutasi di Tab Baru Browser">
+                        <i class="fa fa-external-link"></i> Buka Halaman Lengkap (Tab Baru)
+                    </a>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="switchBackToApTab();" style="font-weight: bold; border-radius: 4px;">
+                        <i class="fa fa-arrow-left"></i> Kembali ke Formulir Pelunasan A/P
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" onclick="reloadCurrentMutasiTab();" style="border-radius: 4px; margin-left: 5px;" title="Muat Ulang Mutasi">
+                        <i class="fa fa-refresh"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div id="content_tab_mutasi">
+                <div class="text-center text-muted" style="padding: 50px;">
+                    <i class="fa fa-spinner fa-spin fa-3x text-success"></i><br>
+                    <span style="font-size: 13px; margin-top: 10px; display: inline-block;">Memuat data mutasi buku pembantu supplier lengkap...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

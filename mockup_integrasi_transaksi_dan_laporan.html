@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup Integrasi: UI Transaksi vs Laporan Cek Rekening 1010020030</title>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2b6cb0;
+            --accent: #3182ce;
+            --success: #22543d;
+            --success-bg: #c6f6d5;
+            --warning: #744210;
+            --warning-bg: #fefcbf;
+            --danger: #742a2a;
+            --danger-bg: #fed7d7;
+            --gray-bg: #edf2f7;
+            --border: #cbd5e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #e2e8f0;
+            color: #2d3748;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        /* Top Simulation Bar */
+        .simulation-banner {
+            background: #2d3748;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ed8936;
+        }
+
+        .simulation-banner h2 {
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mode-switcher {
+            display: flex;
+            gap: 8px;
+            background: #1a202c;
+            padding: 4px;
+            border-radius: 6px;
+        }
+
+        .btn-mode {
+            background: transparent;
+            color: #a0aec0;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+
+        .btn-mode.active {
+            background: #3182ce;
+            color: #fff;
+        }
+
+        /* Main ERP App Wrapper */
+        .erp-window {
+            max-width: 1350px;
+            margin: 15px auto;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #cbd5e0;
+        }
+
+        /* ERP Header */
+        .erp-navbar {
+            background: #1a365d;
+            color: #fff;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .erp-title {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .erp-user {
+            font-size: 11px;
+            color: #e2e8f0;
+        }
+
+        /* Stepper & Tabs Navigation */
+        .nav-tabs-wrapper {
+            background: #2b6cb0;
+            padding: 6px 16px 0 16px;
+            display: flex;
+            gap: 4px;
+            border-bottom: 2px solid #1a365d;
+        }
+
+        .main-tab {
+            padding: 8px 18px;
+            background: rgba(255,255,255,0.15);
+            color: #e2e8f0;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-bottom: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .main-tab:hover {
+            background: rgba(255,255,255,0.25);
+            color: #fff;
+        }
+
+        .main-tab.active {
+            background: #ffffff;
+            color: #1a365d;
+            border-color: #cbd5e0;
+            border-top: 3px solid #ed8936;
+        }
+
+        .tab-badge {
+            background: #e53e3e;
+            color: #fff;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+        }
+
+        .tab-badge-blue {
+            background: #2b6cb0;
+            color: #fff;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+        }
+
+        /* Content Container */
+        .tab-content-area {
+            padding: 16px;
+            background: #f7fafc;
+            min-height: 550px;
+        }
+
+        /* Action & Filter Toolbar */
+        .toolbar-box {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+
+        .toolbar-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .status-alert-bar {
+            background: #ebf8ff;
+            border-left: 4px solid #3182ce;
+            padding: 10px 14px;
+            border-radius: 4px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .status-alert-bar strong {
+            color: #2b6cb0;
+        }
+
+        .btn-action-primary {
+            background: #38a169;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action-primary:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .filter-badges {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge-btn {
+            background: #edf2f7;
+            border: 1px solid #cbd5e0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .badge-btn.active {
+            background: #2b6cb0;
+            color: #fff;
+            border-color: #2b6cb0;
+        }
+
+        /* Data Tables */
+        .erp-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border: 1px solid var(--border);
+            font-size: 11px;
+        }
+
+        .erp-table th, .erp-table td {
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .erp-table th {
+            background: #edf2f7;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 10px;
+            color: #2d3748;
+        }
+
+        .erp-table tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+        .erp-table tr.selected-row {
+            background: #feebc8 !important;
+        }
+
+        .text-right { text-align: right !important; }
+        .text-center { text-align: center !important; }
+        .font-mono { font-family: "Courier New", Courier, monospace; }
+        .font-bold { font-weight: 700; }
+        .text-blue { color: #2b6cb0; font-weight: 700; }
+        .text-green { color: #22543d; font-weight: 700; }
+        .text-red { color: #9b2c2c; font-weight: 700; }
+
+        .tag-status {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .tag-safe { background: var(--success-bg); color: var(--success); }
+        .tag-warn { background: var(--warning-bg); color: var(--warning); }
+        .tag-danger { background: var(--danger-bg); color: var(--danger); }
+
+        /* KPI Cards in Tab 2 */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .kpi-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px 14px;
+            border-left: 4px solid #3182ce;
+        }
+
+        .kpi-card.green { border-left-color: #38a169; }
+        .kpi-card.red { border-left-color: #e53e3e; }
+        .kpi-card.orange { border-left-color: #dd6b20; }
+
+        .kpi-title { font-size: 10px; text-transform: uppercase; color: #718096; font-weight: 700; }
+        .kpi-number { font-size: 18px; font-weight: 800; margin-top: 4px; color: #1a202c; }
+        .kpi-sub { font-size: 10px; color: #a0aec0; margin-top: 2px; }
+
+        /* Drilldown & Collapsible in Tab 2 */
+        .collapsible-trigger {
+            background: #edf2f7 !important;
+            cursor: pointer;
+            font-weight: 700;
+            border-left: 4px solid #718096 !important;
+        }
+
+        .row-zero-balance {
+            display: none;
+            background: #fafbfc;
+        }
+
+        .drilldown-chevron {
+            display: inline-block;
+            width: 14px;
+            font-size: 10px;
+            color: #3182ce;
+            transition: transform 0.2s;
+        }
+
+        .drilldown-chevron.open { transform: rotate(90deg); }
+
+        .drilldown-box {
+            display: none;
+            background: #f8fafc;
+            padding: 10px 14px;
+            border-bottom: 1px solid #cbd5e0;
+        }
+
+        .sub-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border: 1px solid #cbd5e0;
+            font-size: 10.5px;
+        }
+
+        .sub-table th, .sub-table td {
+            padding: 6px 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .sub-table th { background: #f1f5f9; color: #4a5568; font-size: 10px; }
+
+        /* Drawer / Modal Simulation */
+        .drawer-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+            justify-content: flex-end;
+        }
+
+        .drawer-panel {
+            width: 75%;
+            max-width: 1050px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -4px 0 16px rgba(0,0,0,0.25);
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #2b6cb0;
+            margin-bottom: 16px;
+        }
+
+        .btn-close-drawer {
+            background: #e2e8f0;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Simulation Control Bar -->
+<div class="simulation-banner">
+    <h2>
+        <span>MOCKUP SOLUSI INTEGRASI:</span>
+        <span style="color: #fbd38d;">Memadukan UI Transaksi &amp; Laporan Akuntansi Rekening 1010020030</span>
+    </h2>
+    <div class="mode-switcher">
+        <span style="color:#a0aec0; font-size:11px; align-self:center; margin-right:4px;">Pilih Pendekatan:</span>
+        <button class="btn-mode active" id="btnModeTabs" onclick="switchPrototypeMode('tabs')">Opsi A: Model Dua Tab (Direkomendasikan)</button>
+        <button class="btn-mode" id="btnModeDrawer" onclick="switchPrototypeMode('drawer')">Opsi C: Model Drawer Pop-Up</button>
+    </div>
+</div>
+
+<!-- Main ERP Frame -->
+<div class="erp-window">
+    
+    <!-- Navbar Header -->
+    <div class="erp-navbar">
+        <div class="erp-title">
+            <span style="background: #ed8936; color:#fff; padding: 2px 6px; border-radius: 3px; font-size: 11px;">MODUL</span>
+            REALISASI KLAIM DISKON KE SUPPLIER (3333)
+        </div>
+        <div class="erp-user">
+            Login: <strong>Shadow</strong> | Cabang: <strong>PUSAT (DC)</strong>
+        </div>
+    </div>
+
+    <!-- Stepper & Dual-Tab Navigation (Opsi A) -->
+    <div class="nav-tabs-wrapper" id="navTabsContainer">
+        <!-- Tab 1: Operasional Transaksi -->
+        <div class="main-tab active" id="tabNav1" onclick="switchMainTab(1)">
+            <span>⚡ [1] DAFTAR GRN SIAP KLAIM (OPERASIONAL)</span>
+            <span class="tab-badge" id="badgeSisaNota">8 Nota</span>
+        </div>
+        <!-- Tab 2: Laporan Audit Rekening 1010020030 -->
+        <div class="main-tab" id="tabNav2" onclick="switchMainTab(2)">
+            <span>📊 [2] POSISI REKENING 1010020030 &amp; AUDIT</span>
+            <span class="tab-badge-blue">Saldo: Rp 9,4 Jt</span>
+        </div>
+    </div>
+
+    <!-- Area Konten -->
+    <div class="tab-content-area">
+
+        <!-- ======================================================== -->
+        <!-- TAB 1: UI OPERASIONAL TRANSAKSI (TIDAK BERUBAH DARI SCREENSHOT) -->
+        <!-- ======================================================== -->
+        <div id="tabContent1">
+            
+            <!-- Banner Pemilihan Nota -->
+            <div class="status-alert-bar">
+                <div>
+                    <span style="font-size: 14px;"><strong><span id="selectedCountText">0</span> Nota Terpilih</strong></span>
+                    <span style="color: #718096; margin: 0 8px;">|</span>
+                    <span>Total Nominal Klaim: <strong class="text-blue" id="selectedTotalText">Rp 0</strong></span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <!-- Tombol Cek Saldo Cepat (Jika Mode C aktif) -->
+                    <button class="badge-btn" id="btnOpenDrawerInTab1" style="display:none; background:#bee3f8; border-color:#90cdf4; color:#2b6cb0; font-weight:700;" onclick="openDrawerModal()">
+                        🔍 Cek Posisi Saldo COA (Drawer)
+                    </button>
+                    <!-- Tombol Proses Transaksi -->
+                    <button class="btn-action-primary" id="btnProsesKlaim" disabled onclick="alert('Lanjut ke Form Checkout Transaksi 3333 dengan Nota Terpilih!')">
+                        <span>+ PROSES TRANSAKSI KLAIM (3333)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Toolbar Filter -->
+            <div class="toolbar-box">
+                <div class="toolbar-row">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <label style="font-weight: 700; color:#4a5568;">PILIH SUPPLIER:</label>
+                        <select style="padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e0; font-size: 11px;">
+                            <option>-- Semua Supplier --</option>
+                            <option>PT. PANASONIC GOBEL INDONESIA</option>
+                            <option>PT SAFKINDO SAKTI</option>
+                            <option>PT DAIKIN AIRCONDITIONING INDONESIA</option>
+                            <option>PT. FACTORY OUTLET ELEKTRONIKA</option>
+                            <option>PT. SHARP ELECTRONICS INDONESIA</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <input type="text" placeholder="Cari Nomer GRN / PO..." style="padding: 4px 8px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 11px; width: 200px;">
+                    </div>
+                </div>
+                <div class="filter-badges">
+                    <span style="color:#718096; font-size:10px; align-self:center; margin-right:4px;">Kategori:</span>
+                    <button class="badge-btn active">Semua (8)</button>
+                    <button class="badge-btn">Hanya Diskon Reguler (7)</button>
+                    <button class="badge-btn">Hanya Free Produk (1)</button>
+                    <button class="badge-btn">Diskon 1 (7)</button>
+                    <button class="badge-btn">Diskon 2 (2)</button>
+                </div>
+            </div>
+
+            <!-- Tabel Transaksi Operasional Siap Centang -->
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30px;" class="text-center"><input type="checkbox" id="chkSelectAll" onclick="toggleSelectAllRows(this)"></th>
+                        <th style="width: 30px;" class="text-center">No.</th>
+                        <th style="width: 105px;">Date</th>
+                        <th>Supplier / Vendor</th>
+                        <th style="width: 100px;">Nomer GRN</th>
+                        <th style="width: 115px;">Nomer PO</th>
+                        <th style="width: 60px;">Person</th>
+                        <th class="text-right">Diskon 1</th>
+                        <th class="text-right">Diskon 2</th>
+                        <th class="text-right">Free Produk</th>
+                        <th class="text-right font-bold" style="background:#f7fafc;">Diskon Supplier</th>
+                        <th class="text-center" style="width: 90px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="tx-row" data-val="4850330">
+                        <td class="text-center"><input type="checkbox" class="tx-chk" onclick="recalcSelection()"></td>
+                        <td class="text-center">1</td>
+                        <td>29/10/2026 19:47</td>
+                        <td class="font-bold">PT. PANASONIC GOBEL INDONESIA</td>
+                        <td><strong class="text-blue">GRN.-1.5706</strong></td>
+                        <td>PO.FG.-1.3657-03657</td>
+                        <td>Alia</td>
+                        <td class="text-right font-mono">Rp 3.114.836</td>
+                        <td class="text-right font-mono">Rp 1.735.494</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono font-bold text-red" style="background:#f7fafc;">Rp 4.850.330</td>
+                        <td class="text-center"><span class="tag-status tag-warn">Belum Diklaim</span></td>
+                    </tr>
+                    <tr class="tx-row" data-val="242000">
+                        <td class="text-center"><input type="checkbox" class="tx-chk" onclick="recalcSelection()"></td>
+                        <td class="text-center">2</td>
+                        <td>25/10/2026 11:58</td>
+                        <td class="font-bold">PT. SHARP ELECTRONICS INDONESIA</td>
+                        <td><strong class="text-blue">GRN.-1.5659</strong></td>
+                        <td>PO.FG.-1.3639-03639</td>
+                        <td>Alia</td>
+                        <td class="text-right font-mono">Rp 96.800</td>
+                        <td class="text-right font-mono">Rp 145.200</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono font-bold text-red" style="background:#f7fafc;">Rp 242.000</td>
+                        <td class="text-center"><span class="tag-status tag-warn">Belum Diklaim</span></td>
+                    </tr>
+                    <tr class="tx-row" data-val="2846880">
+                        <td class="text-center"><input type="checkbox" class="tx-chk" onclick="recalcSelection()"></td>
+                        <td class="text-center">3</td>
+                        <td>21/10/2026 16:45</td>
+                        <td class="font-bold">PT SAFKINDO SAKTI</td>
+                        <td><strong class="text-blue">GRN.-1.5634</strong></td>
+                        <td>PO.FG.-1.3627-03627</td>
+                        <td>Alia</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono">Rp 2.846.880</td>
+                        <td class="text-right font-mono font-bold text-red" style="background:#f7fafc;">Rp 2.846.880</td>
+                        <td class="text-center"><span class="tag-status tag-warn">Belum Diklaim</span></td>
+                    </tr>
+                    <tr class="tx-row" data-val="1332587">
+                        <td class="text-center"><input type="checkbox" class="tx-chk" onclick="recalcSelection()"></td>
+                        <td class="text-center">4</td>
+                        <td>13/10/2026 12:01</td>
+                        <td class="font-bold">PT DAIKIN AIRCONDITIONING INDONESIA</td>
+                        <td><strong class="text-blue">GRN.-1.5601</strong></td>
+                        <td>PO.FG.-1.3595-03595</td>
+                        <td>Alia</td>
+                        <td class="text-right font-mono">Rp 1.332.587</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono font-bold text-red" style="background:#f7fafc;">Rp 1.332.587</td>
+                        <td class="text-center"><span class="tag-status tag-warn">Belum Diklaim</span></td>
+                    </tr>
+                    <tr class="tx-row" data-val="956760">
+                        <td class="text-center"><input type="checkbox" class="tx-chk" onclick="recalcSelection()"></td>
+                        <td class="text-center">5</td>
+                        <td>07/10/2026 11:22</td>
+                        <td class="font-bold">PT. PANASONIC GOBEL INDONESIA</td>
+                        <td><strong class="text-blue">GRN.-1.5540</strong></td>
+                        <td>PO.FG.-1.3493-03493</td>
+                        <td>Alia</td>
+                        <td class="text-right font-mono">Rp 956.760</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono font-bold text-red" style="background:#f7fafc;">Rp 956.760</td>
+                        <td class="text-center"><span class="tag-status tag-warn">Belum Diklaim</span></td>
+                    </tr>
+                    <tr class="tx-row" data-val="286800">
+                        <td class="text-center"><input type="checkbox" class="tx-chk" onclick="recalcSelection()"></td>
+                        <td class="text-center">6</td>
+                        <td>06/10/2026 13:08</td>
+                        <td class="font-bold">PT. PANASONIC GOBEL INDONESIA</td>
+                        <td><strong class="text-blue">GRN.-1.5529</strong></td>
+                        <td>PO.FG.-1.3491-03491</td>
+                        <td>Alia</td>
+                        <td class="text-right font-mono">Rp 286.800</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono font-bold text-red" style="background:#f7fafc;">Rp 286.800</td>
+                        <td class="text-center"><span class="tag-status tag-warn">Belum Diklaim</span></td>
+                    </tr>
+                    <tr class="tx-row" data-val="3110500">
+                        <td class="text-center"><input type="checkbox" class="tx-chk" onclick="recalcSelection()"></td>
+                        <td class="text-center">7</td>
+                        <td>06/10/2026 10:53</td>
+                        <td class="font-bold">PT. PANASONIC GOBEL INDONESIA</td>
+                        <td><strong class="text-blue">GRN.-1.5523</strong></td>
+                        <td>PO.FG.-1.3491-03491</td>
+                        <td>Alia</td>
+                        <td class="text-right font-mono">Rp 3.110.500</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono font-bold text-red" style="background:#f7fafc;">Rp 3.110.500</td>
+                        <td class="text-center"><span class="tag-status tag-warn">Belum Diklaim</span></td>
+                    </tr>
+                    <tr class="tx-row" data-val="409411">
+                        <td class="text-center"><input type="checkbox" class="tx-chk" onclick="recalcSelection()"></td>
+                        <td class="text-center">8</td>
+                        <td>03/10/2026 15:47</td>
+                        <td class="font-bold">PT. FACTORY OUTLET ELEKTRONIKA</td>
+                        <td><strong class="text-blue">GRN.-1.5513</strong></td>
+                        <td>PO.FG.-1.3531-03531</td>
+                        <td>Alia</td>
+                        <td class="text-right font-mono">Rp 409.411</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">-</td>
+                        <td class="text-right font-mono font-bold text-red" style="background:#f7fafc;">Rp 409.411</td>
+                        <td class="text-center"><span class="tag-status tag-warn">Belum Diklaim</span></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr style="background:#edf2f7; font-weight:700;">
+                        <th colspan="7" class="text-center">TOTAL NOTA SIAP KLAIM DI GUDANG PUSAT (8 NOTA)</th>
+                        <th class="text-right font-mono">Rp 9.300.894</th>
+                        <th class="text-right font-mono">Rp 1.880.694</th>
+                        <th class="text-right font-mono">Rp 2.846.880</th>
+                        <th class="text-right font-mono font-bold text-red" style="background:#e2e8f0;">Rp 14.028.468</th>
+                        <th class="text-center"><span class="tag-status tag-warn">PENDING</span></th>
+                    </tr>
+                </tfoot>
+            </table>
+
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- TAB 2: LAPORAN CEK SALDO & AUDIT REKENING 1010020030 -->
+        <!-- ======================================================== -->
+        <div id="tabContent2" style="display: none;">
+            
+            <!-- Ringkasan Eksekutif KPI Akun -->
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-title">Total Klaim Masuk (Debet)</div>
+                    <div class="kpi-number text-blue">Rp 35.339.444</div>
+                    <div class="kpi-sub">Total akumulasi hak klaim (15 Vendor)</div>
+                </div>
+                <div class="kpi-card green">
+                    <div class="kpi-title">Realisasi Pemakaian (Kredit)</div>
+                    <div class="kpi-number text-green">Rp 25.900.000</div>
+                    <div class="kpi-sub">Klaim cair via Trx 3333 / AP Set-Off</div>
+                </div>
+                <div class="kpi-card red">
+                    <div class="kpi-title">Saldo Aktif Berjalan (Net)</div>
+                    <div class="kpi-number text-red">Rp 9.439.444</div>
+                    <div class="kpi-sub">Sisa piutang hak klaim belum cair</div>
+                </div>
+                <div class="kpi-card orange">
+                    <div class="kpi-title">Rasio Realisasi Klaim</div>
+                    <div class="kpi-number">73,29 %</div>
+                    <div class="kpi-sub">Tingkat likuidasi piutang supplier</div>
+                </div>
+            </div>
+
+            <!-- Toolbar Audit -->
+            <div class="toolbar-box">
+                <div class="toolbar-row">
+                    <div>
+                        <strong style="font-size: 13px; color:#1a365d;">REKAPITULASI BUKU PEMBANTU (SUB-LEDGER) COA 1010020030</strong>
+                        <p style="font-size: 11px; color:#718096; margin-top:2px;">Klik pada baris nama supplier untuk membuka kartu mutasi masuk/keluar secara lengkap.</p>
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="badge-btn" onclick="toggleAllAuditMutations()"><i class="fa fa-folder-open"></i> Buka Semua Mutasi</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabel Rekapitulasi Sub-Ledger Akuntansi -->
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th style="width: 35px;" class="text-center">No.</th>
+                        <th>Nama Supplier / Rekening Pembantu <span style="font-weight:normal; color:#718096;">(Klik untuk kartu mutasi)</span></th>
+                        <th class="text-center" style="width: 80px;">Jml GRN</th>
+                        <th class="text-right">Klaim Masuk (Debet)</th>
+                        <th class="text-right">Realisasi (Kredit)</th>
+                        <th class="text-right">Saldo Aktif (Net)</th>
+                        <th class="text-center" style="width: 90px;">% Realisasi</th>
+                        <th class="text-center" style="width: 95px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Vendor 1: Panasonic (Klik untuk buka mutasi) -->
+                    <tr class="supplier-clickable-row" onclick="toggleSingleAudit('p1')" style="cursor: pointer;">
+                        <td class="text-center">1</td>
+                        <td>
+                            <span class="drilldown-chevron" id="chev-p1">▶</span>
+                            <strong class="text-blue">PT. PANASONIC GOBEL INDONESIA</strong>
+                            <span style="font-size: 10px; color:#3182ce; margin-left: 6px;">[Lihat 5 Mutasi]</span>
+                        </td>
+                        <td class="text-center">4</td>
+                        <td class="text-right font-mono">Rp 9.204.426</td>
+                        <td class="text-right font-mono text-green">Rp 3.550.000</td>
+                        <td class="text-right font-mono text-red font-bold">Rp 5.654.426</td>
+                        <td class="text-center font-bold">38,5%</td>
+                        <td class="text-center"><span class="tag-status tag-warn">Sebagian</span></td>
+                    </tr>
+                    <!-- Drawer Mutasi Panasonic -->
+                    <tr id="box-p1" style="display: none;">
+                        <td colspan="8" style="padding: 0;">
+                            <div class="drilldown-box" style="display: block;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-weight:700;">
+                                    <span style="color:#2b6cb0;">KARTU MUTASI RINCI: PT. PANASONIC GOBEL INDONESIA</span>
+                                    <span class="text-red">Sisa Saldo: Rp 5.654.426</span>
+                                </div>
+                                <table class="sub-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Tgl Posting</th>
+                                            <th>No. GRN</th>
+                                            <th>No. PO</th>
+                                            <th>Uraian Klaim</th>
+                                            <th class="text-right">Masuk (Debet)</th>
+                                            <th class="text-right">Keluar (Kredit)</th>
+                                            <th class="text-right">Saldo Berjalan</th>
+                                            <th>Dokumen Klaim</th>
+                                            <th>Petugas</th>
+                                            <th>Audit Trail / Keterangan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>06/10/2026 10:53</td>
+                                            <td><strong>GRN.-1.5523</strong></td>
+                                            <td>PO.FG.-1.3491</td>
+                                            <td>Diskon 1 Reguler</td>
+                                            <td class="text-right font-mono">Rp 3.110.500</td>
+                                            <td class="text-right font-mono">-</td>
+                                            <td class="text-right font-mono font-bold">Rp 3.110.500</td>
+                                            <td>Penerimaan</td>
+                                            <td>Alia</td>
+                                            <td>Pengakuan piutang hak diskon pembelian AC</td>
+                                        </tr>
+                                        <tr>
+                                            <td>06/10/2026 13:08</td>
+                                            <td><strong>GRN.-1.5529</strong></td>
+                                            <td>PO.FG.-1.3491</td>
+                                            <td>Diskon 1 Reguler</td>
+                                            <td class="text-right font-mono">Rp 286.800</td>
+                                            <td class="text-right font-mono">-</td>
+                                            <td class="text-right font-mono font-bold">Rp 3.397.300</td>
+                                            <td>Penerimaan</td>
+                                            <td>Alia</td>
+                                            <td>Hak diskon invoice penerimaan gudang</td>
+                                        </tr>
+                                        <tr>
+                                            <td>07/10/2026 11:22</td>
+                                            <td><strong>GRN.-1.5540</strong></td>
+                                            <td>PO.FG.-1.3493</td>
+                                            <td>Diskon 1 Reguler</td>
+                                            <td class="text-right font-mono">Rp 956.760</td>
+                                            <td class="text-right font-mono">-</td>
+                                            <td class="text-right font-mono font-bold">Rp 4.354.060</td>
+                                            <td>Penerimaan</td>
+                                            <td>Alia</td>
+                                            <td>Diskon invoice faktur reguler</td>
+                                        </tr>
+                                        <tr style="background:#f0fff4;">
+                                            <td>10/10/2026 14:15</td>
+                                            <td><strong>GRN.-1.5523</strong></td>
+                                            <td>PO.FG.-1.3491</td>
+                                            <td><strong class="text-green">Pencairan Transfer Giro BCA</strong></td>
+                                            <td class="text-right font-mono">-</td>
+                                            <td class="text-right font-mono text-green font-bold">Rp 3.550.000</td>
+                                            <td class="text-right font-mono font-bold">Rp 804.060</td>
+                                            <td><strong class="text-green">TRX.3333-0042</strong></td>
+                                            <td>Hendra</td>
+                                            <td>Pencairan saldo klaim ke Bank BCA (#BCA-9921)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>29/10/2026 19:47</td>
+                                            <td><strong>GRN.-1.5706</strong></td>
+                                            <td>PO.FG.-1.3657</td>
+                                            <td>Diskon 1 &amp; Diskon 2</td>
+                                            <td class="text-right font-mono">Rp 4.850.330</td>
+                                            <td class="text-right font-mono">-</td>
+                                            <td class="text-right font-mono font-bold text-red">Rp 5.654.426</td>
+                                            <td><span class="tag-status tag-warn">Pending</span></td>
+                                            <td>Alia</td>
+                                            <td>GRN Final Posting (Menunggu proses klaim)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Vendor 2: Safkindo Sakti -->
+                    <tr class="supplier-clickable-row" onclick="toggleSingleAudit('p2')" style="cursor: pointer;">
+                        <td class="text-center">2</td>
+                        <td>
+                            <span class="drilldown-chevron" id="chev-p2">▶</span>
+                            <strong class="text-blue">PT SAFKINDO SAKTI</strong>
+                            <span style="font-size: 10px; color:#3182ce; margin-left: 6px;">[Lihat 1 Mutasi]</span>
+                        </td>
+                        <td class="text-center">1</td>
+                        <td class="text-right font-mono">Rp 2.846.880</td>
+                        <td class="text-right font-mono text-green">Rp 0</td>
+                        <td class="text-right font-mono text-red font-bold">Rp 2.846.880</td>
+                        <td class="text-center font-bold">0%</td>
+                        <td class="text-center"><span class="tag-status tag-danger">Belum Diklaim</span></td>
+                    </tr>
+                    <tr id="box-p2" style="display: none;">
+                        <td colspan="8" style="padding: 0;">
+                            <div class="drilldown-box" style="display: block;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-weight:700;">
+                                    <span style="color:#2b6cb0;">KARTU MUTASI RINCI: PT SAFKINDO SAKTI</span>
+                                    <span class="text-red">Sisa Saldo: Rp 2.846.880</span>
+                                </div>
+                                <table class="sub-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Tgl Posting</th>
+                                            <th>No. GRN</th>
+                                            <th>No. PO</th>
+                                            <th>Uraian Klaim</th>
+                                            <th class="text-right">Masuk (Debet)</th>
+                                            <th class="text-right">Keluar (Kredit)</th>
+                                            <th class="text-right">Saldo Berjalan</th>
+                                            <th>Dokumen Klaim</th>
+                                            <th>Petugas</th>
+                                            <th>Audit Trail / Keterangan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>21/10/2026 16:45</td>
+                                            <td><strong>GRN.-1.5634</strong></td>
+                                            <td>PO.FG.-1.3627</td>
+                                            <td>Free Produk (Diskon Slot 7)</td>
+                                            <td class="text-right font-mono">Rp 2.846.880</td>
+                                            <td class="text-right font-mono">-</td>
+                                            <td class="text-right font-mono font-bold text-red">Rp 2.846.880</td>
+                                            <td><span class="tag-status tag-danger">Pending</span></td>
+                                            <td>Alia</td>
+                                            <td>Hak kompensasi free produk dari pesanan PO belum dicairkan</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Baris Collapsible Saldo Rp 0 (10 Vendor) -->
+                    <tr class="collapsible-trigger" onclick="toggleZeroAuditRows()">
+                        <td class="text-center font-bold" style="color:#2b6cb0;"><span id="chevZero">▶</span></td>
+                        <td colspan="2">
+                            <strong>DAFTAR MITRA SUPPLIER DENGAN SALDO NIHIL / LUNAS (SALDO RP 0)</strong>
+                            <span style="background:#cbd5e0; padding:1px 6px; border-radius:10px; font-size:10px; font-weight:700; margin-left:6px;">10 Vendor</span>
+                            <span style="font-size:10px; color:#718096; margin-left:6px; font-style:italic;">(Klik untuk buka rincian...)</span>
+                        </td>
+                        <td class="text-right font-mono">Rp 22.350.000</td>
+                        <td class="text-right font-mono text-green font-bold">Rp 22.350.000</td>
+                        <td class="text-right font-mono font-bold" style="color:#718096;">Rp 0</td>
+                        <td class="text-center font-bold text-green">100%</td>
+                        <td class="text-center"><span class="tag-status tag-safe">LUNAS / NIHIL</span></td>
+                    </tr>
+
+                    <!-- Vendor-Vendor Lunas Saldo 0 -->
+                    <tr class="row-zero-audit" style="display:none; background:#fafafa;">
+                        <td class="text-center" style="color:#a0aec0;">6</td>
+                        <td><span style="color:#a0aec0; margin-left:14px;">└─</span> <strong>PT. SAMSUNG ELECTRONICS INDONESIA</strong></td>
+                        <td class="text-center">5</td>
+                        <td class="text-right font-mono">Rp 8.200.000</td>
+                        <td class="text-right font-mono text-green font-bold">Rp 8.200.000</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">Rp 0</td>
+                        <td class="text-center font-bold text-green">100%</td>
+                        <td class="text-center"><span class="tag-status tag-safe">Lunas Selesai</span></td>
+                    </tr>
+                    <tr class="row-zero-audit" style="display:none; background:#fafafa;">
+                        <td class="text-center" style="color:#a0aec0;">7</td>
+                        <td><span style="color:#a0aec0; margin-left:14px;">└─</span> <strong>PT. LG ELECTRONICS INDONESIA</strong></td>
+                        <td class="text-center">3</td>
+                        <td class="text-right font-mono">Rp 4.500.000</td>
+                        <td class="text-right font-mono text-green font-bold">Rp 4.500.000</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">Rp 0</td>
+                        <td class="text-center font-bold text-green">100%</td>
+                        <td class="text-center"><span class="tag-status tag-safe">Lunas Selesai</span></td>
+                    </tr>
+                    <tr class="row-zero-audit" style="display:none; background:#fafafa;">
+                        <td class="text-center" style="color:#a0aec0;">8</td>
+                        <td><span style="color:#a0aec0; margin-left:14px;">└─</span> <strong>PT. POLYTRON (HARTONO ISTANA TEKNOLOGI)</strong></td>
+                        <td class="text-center">2</td>
+                        <td class="text-right font-mono">Rp 3.100.000</td>
+                        <td class="text-right font-mono text-green font-bold">Rp 3.100.000</td>
+                        <td class="text-right font-mono" style="color:#a0aec0;">Rp 0</td>
+                        <td class="text-center font-bold text-green">100%</td>
+                        <td class="text-center"><span class="tag-status tag-safe">Lunas Selesai</span></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr style="background:#e2e8f0; font-weight:800;">
+                        <th colspan="2" class="text-center">TOTAL KONSOLIDASI AKUN 1010020030</th>
+                        <th class="text-center">23</th>
+                        <th class="text-right font-mono">Rp 35.339.444</th>
+                        <th class="text-right font-mono text-green">Rp 25.900.000</th>
+                        <th class="text-right font-mono text-red">Rp 9.439.444</th>
+                        <th class="text-center">73,29%</th>
+                        <th class="text-center"><span class="tag-status tag-safe">BALANCE</span></th>
+                    </tr>
+                </tfoot>
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Opsi C: Drawer Side-Modal Simulation -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawerModal()">
+    <div class="drawer-panel" onclick="event.stopPropagation()">
+        <div class="drawer-header">
+            <div>
+                <h3 style="color:#1a365d; font-size:16px; font-weight:800;">📊 AUDIT &amp; POSISI REKENING COA 1010020030</h3>
+                <span style="font-size:11px; color:#718096;">Drawer ini dapat dibuka kapan saja langsung dari halaman seleksi transaksi tanpa membatalkan checkbox yang dipilih.</span>
+            </div>
+            <button class="btn-close-drawer" onclick="closeDrawerModal()">✕ Tutup Drawer</button>
+        </div>
+        <div style="padding: 10px 0;">
+            <div class="kpi-row">
+                <div class="kpi-card"><div class="kpi-title">Klaim Masuk</div><div class="kpi-number text-blue">Rp 35,3 Jt</div></div>
+                <div class="kpi-card green"><div class="kpi-title">Realisasi</div><div class="kpi-number text-green">Rp 25,9 Jt</div></div>
+                <div class="kpi-card red"><div class="kpi-title">Saldo Aktif</div><div class="kpi-number text-red">Rp 9,4 Jt</div></div>
+                <div class="kpi-card orange"><div class="kpi-title">Rasio</div><div class="kpi-number">73,3%</div></div>
+            </div>
+            <p style="font-size:12px; color:#4a5568; margin-top:8px;">
+                <em>Kelebihan Opsi C:</em> Petugas kasir/klaim bisa memilih beberapa GRN, lalu mengklik tombol <strong>"Cek Posisi Saldo COA"</strong> untuk memvalidasi sisa hak vendor sebelum menekan tombol proses, tanpa harus pindah halaman.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tab Switcher Logic
+    function switchMainTab(tabIdx) {
+        document.getElementById('tabNav1').classList.remove('active');
+        document.getElementById('tabNav2').classList.remove('active');
+        document.getElementById('tabContent1').style.display = 'none';
+        document.getElementById('tabContent2').style.display = 'none';
+
+        if (tabIdx === 1) {
+            document.getElementById('tabNav1').classList.add('active');
+            document.getElementById('tabContent1').style.display = 'block';
+        } else {
+            document.getElementById('tabNav2').classList.add('active');
+            document.getElementById('tabContent2').style.display = 'block';
+        }
+    }
+
+    // Checkbox Calculation in Tab 1
+    function recalcSelection() {
+        var chks = document.querySelectorAll('.tx-chk');
+        var selectedCount = 0;
+        var totalVal = 0;
+
+        chks.forEach(function(chk) {
+            var row = chk.closest('tr');
+            if (chk.checked) {
+                selectedCount++;
+                totalVal += parseFloat(row.getAttribute('data-val') || 0);
+                row.classList.add('selected-row');
+            } else {
+                row.classList.remove('selected-row');
+            }
+        });
+
+        document.getElementById('selectedCountText').innerText = selectedCount;
+        document.getElementById('selectedTotalText').innerText = 'Rp ' + totalVal.toLocaleString('id-ID');
+        document.getElementById('btnProsesKlaim').disabled = (selectedCount === 0);
+    }
+
+    function toggleSelectAllRows(master) {
+        var chks = document.querySelectorAll('.tx-chk');
+        chks.forEach(function(c) { c.checked = master.checked; });
+        recalcSelection();
+    }
+
+    // Drilldown Single Vendor in Tab 2
+    function toggleSingleAudit(id) {
+        var box = document.getElementById('box-' + id);
+        var chev = document.getElementById('chev-' + id);
+        var isHidden = (box.style.display === 'none' || box.style.display === '');
+        box.style.display = isHidden ? 'table-row' : 'none';
+        chev.classList.toggle('open', isHidden);
+    }
+
+    function toggleAllAuditMutations() {
+        var boxes = [document.getElementById('box-p1'), document.getElementById('box-p2')];
+        var chevs = [document.getElementById('chev-p1'), document.getElementById('chev-p2')];
+        var open = (boxes[0].style.display === 'none');
+        boxes.forEach(function(b) { if(b) b.style.display = open ? 'table-row' : 'none'; });
+        chevs.forEach(function(c) { if(c) c.classList.toggle('open', open); });
+    }
+
+    function toggleZeroAuditRows() {
+        var rows = document.querySelectorAll('.row-zero-audit');
+        var chev = document.getElementById('chevZero');
+        var isHidden = (rows[0].style.display === 'none' || rows[0].style.display === '');
+        rows.forEach(function(r) { r.style.display = isHidden ? 'table-row' : 'none'; });
+        chev.innerHTML = isHidden ? '▼' : '▶';
+    }
+
+    // Prototype Mode Switcher (Top Banner)
+    function switchPrototypeMode(mode) {
+        document.getElementById('btnModeTabs').classList.remove('active');
+        document.getElementById('btnModeDrawer').classList.remove('active');
+
+        if (mode === 'tabs') {
+            document.getElementById('btnModeTabs').classList.add('active');
+            document.getElementById('navTabsContainer').style.display = 'flex';
+            document.getElementById('btnOpenDrawerInTab1').style.display = 'none';
+            switchMainTab(1);
+        } else if (mode === 'drawer') {
+            document.getElementById('btnModeDrawer').classList.add('active');
+            document.getElementById('navTabsContainer').style.display = 'none';
+            document.getElementById('btnOpenDrawerInTab1').style.display = 'inline-block';
+            switchMainTab(1);
+            alert('Mode Opsi C Aktif: Perhatikan tombol biru baru [🔍 Cek Posisi Saldo COA] yang muncul di atas tabel!');
+        }
+    }
+
+    // Drawer Open/Close
+    function openDrawerModal() {
+        document.getElementById('drawerOverlay').style.display = 'flex';
+    }
+
+    function closeDrawerModal() {
+        document.getElementById('drawerOverlay').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
+
